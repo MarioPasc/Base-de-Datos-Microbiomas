@@ -6,6 +6,8 @@ class DbCreation:
     def __init__(self, password: str, database: str) -> None:
         self.password = password
         self.database = database
+        # Stablish a connection. If the schema has 
+        # already been created, this will have no effect
         self.__connection__()
         
     def __connection__(self):
@@ -37,12 +39,4 @@ class DbCreation:
         finally:
             if connection is not None:
                 connection.close()
-        return connection
-                    
-        
-def main():
-    mydb = DbCreation(password="st1rch*bdbiO",
-                      database="microbioma_db")      
-    
-if __name__ == "__main__":
-    main()      
+        return connection  
