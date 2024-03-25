@@ -15,27 +15,11 @@ class DbCreation:
             connection = mysql.connect(
                     host="localhost",
                     user="root",
-                    password=self.password,
-                    database=self.database
-                )
-            print("Done")
-            return connection
+                    password=self.password)
+            cursor= connection.cursor()
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.database}")
         except mysql.Error as err:
             print(f"Error: {err}")
-            if 'Unknown database' in str(err):
-                try:
-                    connection = mysql.connect(
-                        host="localhost",
-                        user="root",
-                        password=self.password
-                    )
-                    cursor = connection.cursor()
-                    cursor.execute(f"CREATE SCHEMA {self.database}")
-                    connection.commit()
-                    print(f"New schema {self.database} created.")
-                    cursor.close()
-                except mysql.Error as err:
-                    print(f"Error creating schema: {err}")
         finally:
             if connection is not None:
                 connection.close()
