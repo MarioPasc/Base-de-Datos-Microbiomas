@@ -1,0 +1,11 @@
+Patient_ID,Age,Birth_Type,Location,Lifestyle,Disease,Sample_ID,Date,Body_Part,Sample_Type,Microorganism_ID,Species,Kingdom,FASTA,Seq_length,qPCR
+PAC-14227-CJJ,44,Natural,Europe,Sedentary,Respiratory infections,SMP-02683-EBR,2020-03-31,Head,Urine,MIC-21822-ASC,Legionella pneumophila,Bacteria,seq_MIC-21822-ASC.fasta,57882282,121
+PAC-60227-RXC,54,Cesarean,Europe,Active,HIV/AIDS,SMP-57744-HWT,2009-06-10,Chest,Blood,MIC-27185-JQD,Human immunodeficiency virus,Viruses,seq_MIC-27185-JQD.fasta,66682867,910
+PAC-85244-CRJ,52,Natural,Europe,Active,Typhoid fever,SMP-81151-EMW,2004-01-24,Leg,Saliva,MIC-23829-AZV,Salmonella typhi,Bacteria,seq_MIC-23829-AZV.fasta,99750923,363
+PAC-83089-CMB,97,Cesarean,North America,Sedentary,Respiratory infections,SMP-56997-RSK,2020-09-15,Chest,Saliva,MIC-64254-KRV,Haemophilus influenzae,Bacteria,seq_MIC-64254-KRV.fasta,14953367,541
+PAC-14498-GNE,13,Natural,Middle East,Active,Tetanus,SMP-57503-AYW,2007-03-15,Arm,Tissue,MIC-58889-GAT,Clostridium tetani,Bacteria,seq_MIC-58889-GAT.fasta,89409749,358
+PAC-08806-OAC,96,Cesarean,North America,Sedentary,Shigellosis,SMP-89103-YUH,2018-07-11,Leg,Tissue,MIC-21714-ZMU,Shigella spp.,Bacteria,seq_MIC-21714-ZMU.fasta,31349564,797
+PAC-79883-LVE,45,Cesarean,Central Asia,Active,Typhoid fever,SMP-52429-RFI,2022-09-23,Hand,Tissue,MIC-23829-AZV,Salmonella typhi,Bacteria,seq_MIC-23829-AZV.fasta,36788921,516
+PAC-91478-DER,76,Cesarean,Antarctica,Sedentary,Typhoid fever,SMP-98076-NGQ,2022-04-11,Leg,Saliva,MIC-23829-AZV,Salmonella typhi,Bacteria,seq_MIC-23829-AZV.fasta,32632483,921
+PAC-70884-BXO,91,Natural,South America,Sedentary,Cholera,SMP-11757-LPJ,2015-06-18,Hand,Urine,MIC-21174-VEX,Vibrio cholerae,Bacteria,seq_MIC-21174-VEX.fasta,94410762,137
+PAC-63842-BAO,75,Cesarean,Europe,Active,Chickenpox,SMP-00352-MOS,2023-06-23,Head,Tissue,MIC-94902-RPG,Varicella-zoster virus,Viruses,seq_MIC-94902-RPG.fasta,4344769,241

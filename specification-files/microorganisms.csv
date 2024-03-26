@@ -1,26 +1,26 @@
-Microorganism_ID,Microorganism_Name,Species,Kingdom,Diseases
-MIC-63271-ZJV,Streptococcus_pyogenes,Streptococcus pyogenes,Bacteria,Streptococcal pharyngitis
-MIC-64254-KRV,Haemophilus_influenzae,Haemophilus influenzae,Bacteria,Respiratory infections
-MIC-79464-FIL,Escherichia_coli,Escherichia coli,Bacteria,Urinary tract infections
-MIC-36334-TJK,Staphylococcus_aureus,Staphylococcus aureus,Bacteria,Skin infections
-MIC-33366-MDC,Mycobacterium_tuberculosis,Mycobacterium tuberculosis,Bacteria,Tuberculosis
-MIC-94902-RPG,Varicella-zoster_virus,Varicella-zoster virus,Viruses,Chickenpox
-MIC-27185-JQD,Human_immunodeficiency_virus,Human immunodeficiency virus,Viruses,HIV/AIDS
-MIC-54855-XTQ,Plasmodium_falciparum,Plasmodium falciparum,Protozoa,Malaria
-MIC-91695-NFU,Candida_albicans,Candida albicans,Fungi,Candidiasis
-MIC-29463-HLU,Neisseria_gonorrhoeae,Neisseria gonorrhoeae,Bacteria,Gonorrhea
-MIC-77893-GDC,Streptococcus_pneumoniae,Streptococcus pneumoniae,Bacteria,Respiratory infections
-MIC-61432-DQS,Klebsiella_pneumoniae,Klebsiella pneumoniae,Bacteria,Respiratory infections
-MIC-56906-SSY,Pseudomonas_aeruginosa,Pseudomonas aeruginosa,Bacteria,"Respiratory infections, Skin infections"
-MIC-90008-XPF,Mycoplasma_pneumoniae,Mycoplasma pneumoniae,Bacteria,Respiratory infections
-MIC-21822-ASC,Legionella_pneumophila,Legionella pneumophila,Bacteria,Respiratory infections
-MIC-29910-WWS,Hepatitis_C_virus,Hepatitis C virus,Viruses,Hepatitis C
-MIC-65290-TFD,Hepatitis_B_virus,Hepatitis B virus,Viruses,Hepatitis B
-MIC-31140-RIJ,Herpes_simplex_virus_1,Herpes simplex virus type 1,Viruses,Herpes simplex
-MIC-48434-UTS,Herpes_simplex_virus_2,Herpes simplex virus type 2,Viruses,Herpes simplex
-MIC-49404-GMV,Human_papillomavirus,Human papillomavirus,Viruses,HPV infections
-MIC-23829-AZV,Salmonella_typhi,Salmonella typhi,Bacteria,Typhoid fever
-MIC-21714-ZMU,Shigella_spp,Shigella spp.,Bacteria,Shigellosis
-MIC-21174-VEX,Vibrio_cholerae,Vibrio cholerae,Bacteria,Cholera
-MIC-58889-GAT,Clostridium_tetani,Clostridium tetani,Bacteria,Tetanus
-MIC-17098-ZUZ,Bordetella_pertussis,Bordetella pertussis,Bacteria,Pertussis
+Microorganism_ID,Species,Kingdom,Diseases
+MIC-63271-ZJV,Streptococcus pyogenes,Bacteria,Streptococcal pharyngitis
+MIC-64254-KRV,Haemophilus influenzae,Bacteria,Respiratory infections
+MIC-79464-FIL,Escherichia coli,Bacteria,Urinary tract infections
+MIC-36334-TJK,Staphylococcus aureus,Bacteria,Skin infections
+MIC-33366-MDC,Mycobacterium tuberculosis,Bacteria,Tuberculosis
+MIC-94902-RPG,Varicella-zoster virus,Viruses,Chickenpox
+MIC-27185-JQD,Human immunodeficiency virus,Viruses,HIV/AIDS
+MIC-54855-XTQ,Plasmodium falciparum,Protozoa,Malaria
+MIC-91695-NFU,Candida albicans,Fungi,Candidiasis
+MIC-29463-HLU,Neisseria gonorrhoeae,Bacteria,Gonorrhea
+MIC-77893-GDC,Streptococcus pneumoniae,Bacteria,Respiratory infections
+MIC-61432-DQS,Klebsiella pneumoniae,Bacteria,Respiratory infections
+MIC-56906-SSY,Pseudomonas aeruginosa,Bacteria,"Respiratory infections, Skin infections"
+MIC-90008-XPF,Mycoplasma pneumoniae,Bacteria,Respiratory infections
+MIC-21822-ASC,Legionella pneumophila,Bacteria,Respiratory infections
+MIC-29910-WWS,Hepatitis C virus,Viruses,Hepatitis C
+MIC-65290-TFD,Hepatitis B virus,Viruses,Hepatitis B
+MIC-31140-RIJ,Herpes simplex virus type 1,Viruses,Herpes simplex
+MIC-48434-UTS,Herpes simplex virus type 2,Viruses,Herpes simplex
+MIC-49404-GMV,Human papillomavirus,Viruses,HPV infections
+MIC-23829-AZV,Salmonella typhi,Bacteria,Typhoid fever
+MIC-21714-ZMU,Shigella spp.,Bacteria,Shigellosis
+MIC-21174-VEX,Vibrio cholerae,Bacteria,Cholera
+MIC-58889-GAT,Clostridium tetani,Bacteria,Tetanus
+MIC-17098-ZUZ,Bordetella pertussis,Bacteria,Pertussis
