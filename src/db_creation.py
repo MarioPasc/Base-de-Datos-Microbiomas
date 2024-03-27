@@ -101,7 +101,8 @@ class DbCreation:
                     Birth_Type ENUM('Cesarean', 'Natural'),
                     Location ENUM('Europe', 'Africa', 'North America', 'South America', 'Central Asia', 'East Asia', 'Antarctica', 'Southeast Asia', 'Middle East', 'Oceania'),
                     Lifestyle ENUM('Active', 'Sedentary'),
-                    Disease TEXT                    
+                    Disease TEXT,
+                    Sex ENUM('M', 'F')                          
                 )''')
             #char is used cause the ids have fixed length
 
@@ -109,8 +110,8 @@ class DbCreation:
                     Sample_ID CHAR(13)  PRIMARY KEY,
                     Patient_ID CHAR(13),       
                     Date DATE,
-                    Body_Part TEXT,
-                    Sample_Type TEXT,
+                    Body_Part VARCHAR(10),
+                    Sample_Type VARCHAR(10),
                     CONSTRAINT sample_patient FOREIGN KEY (Patient_ID) REFERENCES patient (Patient_ID)                    
                 )''')
             cursor.execute('''CREATE TABLE IF NOT EXISTS microorganism (
@@ -186,14 +187,15 @@ class DbCreation:
             cursor (MySQLCursor): The cursor to use for executing SQL queries.
         """
         patient_insert_query = """
-        INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease) 
+        INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease, Sex) 
         VALUES (%s, %s, %s, %s, %s, %s) 
         ON DUPLICATE KEY UPDATE 
         Age=VALUES(Age), 
         Birth_Type=VALUES(Birth_Type), 
         Location=VALUES(Location), 
         Lifestyle=VALUES(Lifestyle), 
-        Disease=VALUES(Disease)"""
+        Disease=VALUES(Disease),
+        Sex=VALUES(Sex)"""
 
         sample_insert_query = """
         INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
@@ -218,7 +220,7 @@ class DbCreation:
         ON DUPLICATE KEY UPDATE qPCR=VALUES(qPCR)"""
 
         for _, row in df.iterrows():
-            patient_data = (row['Patient_ID'], row['Age'], row['Birth_Type'], row['Location'], row['Lifestyle'], row['Disease'])
+            patient_data = (row['Patient_ID'], row['Age'], row['Birth_Type'], row['Location'], row['Lifestyle'], row['Disease'], row['Sex'])
             sample_data = (row['Sample_ID'], row['Patient_ID'], row['Date'], row['Body_Part'], row['Sample_Type'])
             microorganism_data = (row['Microorganism_ID'], row['Species'], row['Kingdom'], row['FASTA'], row['Seq_length'])
             sample_microorganism_data = (row['Microorganism_ID'], row['Sample_ID'], row['qPCR'])
@@ -311,13 +313,15 @@ class DataGenerator:
             'Southeast Asia', 'Middle East', 'Oceania'
         ]
         activity_levels = ['Active', 'Sedentary']
+        sex= ['M','F']
 
         return [
             patient_id(), # Patient ID
             random.randint(0, 100),  # Age
             random.choice(delivery_methods),  # Birth
             random.choice(locations),  # Localization
-            random.choice(activity_levels)  # Activity levels
+            random.choice(activity_levels),  # Activity levels
+            random.choice(sex) #Sex
         ]
         
     def __generateSampleData__(self):
@@ -359,10 +363,10 @@ class DataGenerator:
         Fasta = "seq_" + Microorganism_ID + ".fasta"
         Seq_length = np.random.randint(1000000, 100000000)
         qPCR = np.random.randint(50, 1000)
-        Patient_ID, Age, Birth, Localization, Activity_Levels = self.__generatePatientData__()
+        Patient_ID, Age, Birth, Localization, Activity_Levels, Sex = self.__generatePatientData__()
         Sample_ID, Date, Body_Part, Sample_Type = self.__generateSampleData__()
 
-        return [Patient_ID, Age, Birth, Localization, Activity_Levels, Diseases, Sample_ID, 
+        return [Patient_ID, Age, Birth, Localization, Activity_Levels, Sex, Diseases, Sample_ID, 
                 Date, Body_Part, Sample_Type, Microorganism_ID, Species, Kingdom, Fasta, Seq_length, qPCR]
 
     def generate_random_data(self, i: int):
@@ -383,7 +387,7 @@ class DataGenerator:
                 rows.append(future.result())
 
         df = pd.DataFrame(rows, columns=[
-            "Patient_ID", "Age", "Birth_Type", "Location", "Lifestyle", "Disease", "Sample_ID",
+            "Patient_ID", "Age", "Birth_Type", "Location", "Lifestyle", "Disease", "Sex","Sample_ID",
             "Date", "Body_Part", "Sample_Type", "Microorganism_ID", "Species", "Kingdom",
             "FASTA", "Seq_length", "qPCR"
         ])
