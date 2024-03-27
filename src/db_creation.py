@@ -17,7 +17,7 @@ This code was developed to fulfill an assignment for the final project in the "B
 
 
 
-from typing import List
+from typing import List, Tuple
 import mysql.connector as mysql
 import random
 import string
@@ -161,10 +161,15 @@ class DbCreation:
             seed = 42
             i = 0
             for _ in tqdm(range(num_batches), desc="Inserting batches"):
+                # the first time it will insert all the microorganisms from the csv file
+                if i==0:
+                    self._insert_microorganism_to_db(cursor)
+
                 datagen = DataGenerator(num_samples=batch_size,
                                         seed=seed)
-                df = datagen.generate_random_data(i=i)  
-                self._insert_dataframe_to_db(df, cursor)  
+                sample_df, patients_df= datagen.generate_random_data2(i=i) 
+                self._insert_patient_to_db (patients_df,cursor) 
+                self._insert_sample_to_db(sample_df, cursor) 
                 connection.commit()
                 seed += 1
                 i += 1
@@ -175,36 +180,9 @@ class DbCreation:
             if cursor:
                 cursor.close()
             if connection:
-                connection.close()             
+                connection.close()
     
-    def _insert_dataframe_to_db(self, df, cursor):
-        """
-        Inserts data from a DataFrame into the database using the provided cursor. Data is inserted
-        into the patient, sample, microorganism, and sample_microorganism tables.
-
-        Args:
-            df (DataFrame): The DataFrame containing the data to insert.
-            cursor (MySQLCursor): The cursor to use for executing SQL queries.
-        """
-        patient_insert_query = """
-        INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease, Sex) 
-        VALUES (%s, %s, %s, %s, %s, %s) 
-        ON DUPLICATE KEY UPDATE 
-        Age=VALUES(Age), 
-        Birth_Type=VALUES(Birth_Type), 
-        Location=VALUES(Location), 
-        Lifestyle=VALUES(Lifestyle), 
-        Disease=VALUES(Disease),
-        Sex=VALUES(Sex)"""
-
-        sample_insert_query = """
-        INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
-        VALUES (%s, %s, %s, %s, %s) 
-        ON DUPLICATE KEY UPDATE 
-        Date=VALUES(Date), 
-        Body_Part=VALUES(Body_Part), 
-        Sample_Type=VALUES(Sample_Type)"""
-
+    def _insert_microorganism_to_db(self, cursor):
         microorganism_insert_query = """
         INSERT INTO microorganism (Microorganism_ID, Species, Kingdom, FASTA, Seq_length) 
         VALUES (%s, %s, %s, %s, %s) 
@@ -214,21 +192,56 @@ class DbCreation:
         FASTA=VALUES(FASTA), 
         Seq_length=VALUES(Seq_length)"""
 
+        csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
+        
+        for _, row in csv.iterrows():
+            id= row["Microorganism_ID"]
+            fasta="seq_" + id + ".fasta"
+            Seq_length = np.random.randint(1000000, 100000000)
+            microorganism_data=(id, row["Species"], row["Kingdom"],fasta, Seq_length)
+            cursor.execute(microorganism_insert_query, microorganism_data)
+
+
+    def _insert_sample_to_db(self, df, cursor):
+        sample_insert_query = """
+        INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
+        VALUES (%s, %s, %s, %s, %s) 
+        ON DUPLICATE KEY UPDATE 
+        Date=VALUES(Date), 
+        Body_Part=VALUES(Body_Part), 
+        Sample_Type=VALUES(Sample_Type)"""
+
         sample_microorganism_insert_query = """
         INSERT INTO sample_microorganism (Microorganism_ID, Sample_ID, qPCR) 
         VALUES (%s, %s, %s) 
         ON DUPLICATE KEY UPDATE qPCR=VALUES(qPCR)"""
 
         for _, row in df.iterrows():
-            patient_data = (row['Patient_ID'], row['Age'], row['Birth_Type'], row['Location'], row['Lifestyle'], row['Disease'], row['Sex'])
-            sample_data = (row['Sample_ID'], row['Patient_ID'], row['Date'], row['Body_Part'], row['Sample_Type'])
-            microorganism_data = (row['Microorganism_ID'], row['Species'], row['Kingdom'], row['FASTA'], row['Seq_length'])
+            num_microorganism= row['Num_Microorganisms']
+            if(num_microorganism==0):
+                sample_data = (row['Sample_ID'], row['Patient_ID'], row['Date'], row['Body_Part'], row['Sample_Type'])
+                cursor.execute(sample_insert_query, sample_data)
             sample_microorganism_data = (row['Microorganism_ID'], row['Sample_ID'], row['qPCR'])
-            
-            cursor.execute(patient_insert_query, patient_data)
-            cursor.execute(sample_insert_query, sample_data)
-            cursor.execute(microorganism_insert_query, microorganism_data)
             cursor.execute(sample_microorganism_insert_query, sample_microorganism_data)
+
+
+            
+    def _insert_patient_to_db(self, df, cursor):
+        patient_insert_query = """
+        INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease, Sex) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s) 
+        ON DUPLICATE KEY UPDATE 
+        Age=VALUES(Age), 
+        Birth_Type=VALUES(Birth_Type), 
+        Location=VALUES(Location), 
+        Lifestyle=VALUES(Lifestyle), 
+        Disease=VALUES(Disease),
+        Sex=VALUES(Sex)"""
+        for _, row in df.iterrows():
+            patient_data = (row['Patient_ID'], row['Age'], row['Birth_Type'], row['Location'], row['Lifestyle'], row['Disease'], row['Sex'])
+            cursor.execute(patient_insert_query, patient_data)
+
+    
 
     def drop_db(self) -> None:
         """
@@ -281,18 +294,19 @@ class DataGenerator:
         self.num_samples = num_samples
         random.seed(seed) # ensure reproducibility
         np.random.seed(seed)
-        
-        
+
+    #intentar aprovechar el método para las insercciones??       
     def __generateMicroorganismData__(self) -> str:
         """
-        Generates random data for a microorganism, including its ID, kingdom, species, and diseases.
+        Generates random data for a microorganism, including its ID and diseases.
 
         Returns:
-            tuple: A tuple containing the microorganism ID, kingdom, species, and diseases.
+            tuple: A tuple containing the microorganism ID and diseases.
         """
-        csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
+        csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
+        #le he tenido que quitar los dos puntos???
         row = csv.iloc[np.random.randint(0, csv.shape[0]), :]
-        return row.loc["Microorganism_ID"], row.loc["Kingdom"], row.loc["Species"], row.loc["Diseases"].split(",")[np.random.randint(0, len(row.loc["Diseases"].split(",")))]
+        return row.loc["Microorganism_ID"], row.loc["Diseases"].split(",")[np.random.randint(0, len(row.loc["Diseases"].split(",")))]
     
     def __generatePatientData__(self) -> List:
         """
@@ -352,45 +366,41 @@ class DataGenerator:
         return sample_id(), date, body_part, sample_type   
         
     
-    def generate_single_row(self) -> List:
-        """
-        Generates a single row of data by combining information from microorganisms, patients, and samples.
-
-        Returns:
-            list: A list containing combined data from a microorganism, patient, and sample.
-        """
-        Microorganism_ID, Kingdom, Species, Diseases = self.__generateMicroorganismData__()
-        Fasta = "seq_" + Microorganism_ID + ".fasta"
-        Seq_length = np.random.randint(1000000, 100000000)
-        qPCR = np.random.randint(50, 1000)
-        Patient_ID, Age, Birth, Localization, Activity_Levels, Sex = self.__generatePatientData__()
+    
+    def generate_rows(self, patient_id):
+        rows=[]
+        disease_list=[]
         Sample_ID, Date, Body_Part, Sample_Type = self.__generateSampleData__()
+        num_microorganism= random.randint(1,10)
+        for i in range(num_microorganism):
+            Microorganism_ID, Disease = self.__generateMicroorganismData__()
+            disease_list.append(Disease)
+            qPCR = np.random.randint(50, 1000)
+            rows.append([Sample_ID, Date, Body_Part, Sample_Type, Microorganism_ID, qPCR, patient_id, i])
 
-        return [Patient_ID, Age, Birth, Localization, Activity_Levels, Sex, Diseases, Sample_ID, 
-                Date, Body_Part, Sample_Type, Microorganism_ID, Species, Kingdom, Fasta, Seq_length, qPCR]
 
-    def generate_random_data(self, i: int):
-        """
-        Generates random data for a specified number of samples. Data is generated in parallel
-        and combined into a DataFrame.
+        return rows, disease_list
 
-        Args:
-            i (int): An index representing the current batch of data generation, used for tracking in parallel execution.
 
-        Returns:
-            pd.DataFrame: A DataFrame containing the generated data for the specified number of samples.
-        """
-        rows = []
-        with ThreadPoolExecutor() as executor:
-            futures = [executor.submit(self.generate_single_row) for _ in range(self.num_samples)]
-            for future in tqdm(as_completed(futures), total=self.num_samples, desc=f"Generating Data for batch {i}"):
-                rows.append(future.result())
+    
+    def generate_random_data2(self, i: int):
+        rows=[]
+        #generate all the patient 
+        patients_data=[]
+        while len(patients_data) < self.num_samples:
+            Patient_ID, Age, Birth, Localization, Activity_Levels, Sex = self.__generatePatientData__()
+            for _ in range(random.randint(0, self.num_samples*2//self.num_samples)):  
+                data, disease_list = self.generate_rows(Patient_ID)
+                Disease= random.choice(disease_list)
+                patients_data.append([Patient_ID, Age, Birth, Localization, Activity_Levels, Disease, Sex])
+                rows.extend(data)
 
-        df = pd.DataFrame(rows, columns=[
-            "Patient_ID", "Age", "Birth_Type", "Location", "Lifestyle", "Disease", "Sex","Sample_ID",
-            "Date", "Body_Part", "Sample_Type", "Microorganism_ID", "Species", "Kingdom",
-            "FASTA", "Seq_length", "qPCR"
-        ])
 
-        return df
+        sample_df = pd.DataFrame(rows, columns=[
+            "Sample_ID", "Date", "Body_Part", "Sample_Type", "Microorganism_ID", "qPCR", "Patient_ID", "Num_Microorganisms"])
+        
+        patients_df = pd.DataFrame(patients_data, columns=[
+            "Patient_ID", "Age", "Birth_Type", "Location", "Lifestyle", "Disease", "Sex"])
+        
+        return sample_df, patients_df
 
