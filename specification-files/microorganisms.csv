@@ -4,8 +4,8 @@ MIC-64254-KRV,Haemophilus influenzae,Bacteria,Respiratory infections
 MIC-79464-FIL,Escherichia coli,Bacteria,Urinary tract infections
 MIC-36334-TJK,Staphylococcus aureus,Bacteria,Skin infections
 MIC-33366-MDC,Mycobacterium tuberculosis,Bacteria,Tuberculosis
-MIC-94902-RPG,Varicella-zoster virus,Viruses,Chickenpox
-MIC-27185-JQD,Human immunodeficiency virus,Viruses,HIV/AIDS
+MIC-94902-RPG,Varicella-zoster virus,Virus,Chickenpox
+MIC-27185-JQD,Human immunodeficiency virus,Virus,HIV/AIDS
 MIC-54855-XTQ,Plasmodium falciparum,Protozoa,Malaria
 MIC-91695-NFU,Candida albicans,Fungi,Candidiasis
 MIC-29463-HLU,Neisseria gonorrhoeae,Bacteria,Gonorrhea
@@ -14,11 +14,11 @@ MIC-61432-DQS,Klebsiella pneumoniae,Bacteria,Respiratory infections
 MIC-56906-SSY,Pseudomonas aeruginosa,Bacteria,"Respiratory infections, Skin infections"
 MIC-90008-XPF,Mycoplasma pneumoniae,Bacteria,Respiratory infections
 MIC-21822-ASC,Legionella pneumophila,Bacteria,Respiratory infections
-MIC-29910-WWS,Hepatitis C virus,Viruses,Hepatitis C
-MIC-65290-TFD,Hepatitis B virus,Viruses,Hepatitis B
-MIC-31140-RIJ,Herpes simplex virus type 1,Viruses,Herpes simplex
-MIC-48434-UTS,Herpes simplex virus type 2,Viruses,Herpes simplex
-MIC-49404-GMV,Human papillomavirus,Viruses,HPV infections
+MIC-29910-WWS,Hepatitis C virus,Virus,Hepatitis C
+MIC-65290-TFD,Hepatitis B virus,Virus,Hepatitis B
+MIC-31140-RIJ,Herpes simplex virus type 1,Virus,Herpes simplex
+MIC-48434-UTS,Herpes simplex virus type 2,Virus,Herpes simplex
+MIC-49404-GMV,Human papillomavirus,Virus,HPV infections
 MIC-23829-AZV,Salmonella typhi,Bacteria,Typhoid fever
 MIC-21714-ZMU,Shigella spp.,Bacteria,Shigellosis
 MIC-21174-VEX,Vibrio cholerae,Bacteria,Cholera

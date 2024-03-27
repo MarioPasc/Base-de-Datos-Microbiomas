@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 from datetime import datetime, timedelta
 
+
 class DbCreation:
     
     def __init__(self, password: str, database: str) -> None:
@@ -16,10 +17,10 @@ class DbCreation:
         self.database = database
         # Stablish a connection. If the schema has 
         # already been created, this will have no effect
-        self.__connection__()
+        self.__schema__()
         self.__creation__()
         
-    def __connection__(self):
+    def __schema__(self) -> None:
         print("Establishing connection...")
         try:
             connection = mysql.connect(
@@ -34,7 +35,7 @@ class DbCreation:
             if connection is not None:
                 connection.close()
     
-    def __creation__(self):
+    def __creation__(self) -> None:
         connection= None
         try:
             connection = mysql.connect(
@@ -46,7 +47,7 @@ class DbCreation:
             cursor.execute('''CREATE TABLE IF NOT EXISTS patient (
                     Patient_ID CHAR(13)  PRIMARY KEY,       
                     Age INT CHECK (Age BETWEEN 0 AND 100),
-                    Birth_Type ENUM('cesarean', 'natural'),
+                    Birth_Type ENUM('Cesarean', 'Natural'),
                     Location ENUM('Europe', 'Africa', 'North America', 'South America', 'Central Asia', 'East Asia', 'Antarctica', 'Southeast Asia', 'Middle East', 'Oceania'),
                     Lifestyle ENUM('Active', 'Sedentary'),
                     Disease TEXT                    
@@ -64,7 +65,7 @@ class DbCreation:
             cursor.execute('''CREATE TABLE IF NOT EXISTS microorganism (
                     Microorganism_ID CHAR(13) PRIMARY KEY,
                     Species TEXT,
-                    Kingdom ENUM('bacterium', 'fungi', 'virus', 'protist', 'archaea'),
+                    Kingdom ENUM('Bacteria', 'Fungi', 'Virus', 'Protozoa'),
                     FASTA CHAR(23),
                     Seq_length INT CHECK (Seq_length BETWEEN 1000000 AND 100000000)                
                 )''')
@@ -83,34 +84,106 @@ class DbCreation:
             print(f"Error: {err}")
         finally:
             if connection is not None:
-                connection.close()  
+                connection.close() 
+     
+    def insert_data_in_batches(self, num_samples: int) -> None:
+        batch_size = 100
+        num_batches = (num_samples + batch_size - 1) // batch_size 
+
+        try:
+            connection = mysql.connect(
+                host="localhost",
+                user="root",
+                password=self.password,
+                database=self.database
+            )
+            cursor = connection.cursor()
+
+            seed = 42
+            i = 0
+            for _ in tqdm(range(num_batches), desc="Inserting batches"):
+                datagen = DataGenerator(num_samples=batch_size,
+                                        seed=seed)
+                df = datagen.generate_random_data(i=i)  
+                self._insert_dataframe_to_db(df, cursor)  
+                connection.commit()
+                seed += 1
+                i += 1
+
+        except mysql.Error as err:
+            print(f"Error: {err}")
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()             
     
-    
+    def _insert_dataframe_to_db(self, df, cursor):
+        patient_insert_query = """
+        INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease) 
+        VALUES (%s, %s, %s, %s, %s, %s) 
+        ON DUPLICATE KEY UPDATE 
+        Age=VALUES(Age), 
+        Birth_Type=VALUES(Birth_Type), 
+        Location=VALUES(Location), 
+        Lifestyle=VALUES(Lifestyle), 
+        Disease=VALUES(Disease)"""
+
+        sample_insert_query = """
+        INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
+        VALUES (%s, %s, %s, %s, %s) 
+        ON DUPLICATE KEY UPDATE 
+        Date=VALUES(Date), 
+        Body_Part=VALUES(Body_Part), 
+        Sample_Type=VALUES(Sample_Type)"""
+
+        microorganism_insert_query = """
+        INSERT INTO microorganism (Microorganism_ID, Species, Kingdom, FASTA, Seq_length) 
+        VALUES (%s, %s, %s, %s, %s) 
+        ON DUPLICATE KEY UPDATE 
+        Species=VALUES(Species), 
+        Kingdom=VALUES(Kingdom), 
+        FASTA=VALUES(FASTA), 
+        Seq_length=VALUES(Seq_length)"""
+
+        sample_microorganism_insert_query = """
+        INSERT INTO sample_microorganism (Microorganism_ID, Sample_ID, qPCR) 
+        VALUES (%s, %s, %s) 
+        ON DUPLICATE KEY UPDATE qPCR=VALUES(qPCR)"""
+
+        for _, row in df.iterrows():
+            patient_data = (row['Patient_ID'], row['Age'], row['Birth_Type'], row['Location'], row['Lifestyle'], row['Disease'])
+            sample_data = (row['Sample_ID'], row['Patient_ID'], row['Date'], row['Body_Part'], row['Sample_Type'])
+            microorganism_data = (row['Microorganism_ID'], row['Species'], row['Kingdom'], row['FASTA'], row['Seq_length'])
+            sample_microorganism_data = (row['Microorganism_ID'], row['Sample_ID'], row['qPCR'])
+            
+            cursor.execute(patient_insert_query, patient_data)
+            cursor.execute(sample_insert_query, sample_data)
+            cursor.execute(microorganism_insert_query, microorganism_data)
+            cursor.execute(sample_microorganism_insert_query, sample_microorganism_data)
+
+    def drop_db(self) -> None:
+        try:
+            connection = mysql.connect(
+                    host="localhost",
+                    user="root",
+                    database = self.database,
+                    password=self.password)
+            cursor = connection.cursor()
+            cursor.execute(f"DROP SCHEMA IF EXISTS {self.database}")
+            print(f"Schema {self.database} dropped.")
+        except mysql.Error as err:
+            print(f"Error: {err}")
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()        
+            
 class DataGenerator:
-    def __init__(self, num_samples: int):
+    def __init__(self, num_samples: int, seed: int):
         self.num_samples = num_samples
-        random.seed(42) # ensure reproducibility
-        np.random.seed(42)
-        self.table_names: List[str] = ["Patient", "Sample", "Microorganism", "Sample_Microorganism"]
-        self.all_attributes: List[str] = [
-            "Patient_ID",
-            "Age",
-            "Birth_Type",
-            "Location",
-            "Lifestyle",
-            "Disease",
-            "Sample_ID",
-            "Date",
-            "Body_Part",
-            "Sample_Type",
-            "Microorganism_Name"
-            "Microorganism_ID",
-            "Species",
-            "Kingdom",
-            "FASTA",
-            "Seq_length",
-            "qPCR"
-            ]
+        random.seed(seed) # ensure reproducibility
+        np.random.seed(seed)
         
         
     def __generateMicroorganismData__(self) -> str:
@@ -163,7 +236,6 @@ class DataGenerator:
         
     
     def generate_single_row(self) -> List:
-        # Genera una sola fila de datos.
         Microorganism_ID, Kingdom, Species, Diseases = self.__generateMicroorganismData__()
         Fasta = "seq_" + Microorganism_ID + ".fasta"
         Seq_length = np.random.randint(1000000, 100000000)
@@ -174,11 +246,11 @@ class DataGenerator:
         return [Patient_ID, Age, Birth, Localization, Activity_Levels, Diseases, Sample_ID, 
                 Date, Body_Part, Sample_Type, Microorganism_ID, Species, Kingdom, Fasta, Seq_length, qPCR]
 
-    def generate_random_data(self):
+    def generate_random_data(self, i: int):
         rows = []
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.generate_single_row) for _ in range(self.num_samples)]
-            for future in tqdm(as_completed(futures), total=self.num_samples, desc="Generating Data"):
+            for future in tqdm(as_completed(futures), total=self.num_samples, desc=f"Generating Data for batch {i}"):
                 rows.append(future.result())
 
         df = pd.DataFrame(rows, columns=[

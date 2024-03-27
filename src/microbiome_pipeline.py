@@ -16,10 +16,8 @@ def main():
     
     mydb = db_creation.DbCreation(password=args.password, 
                                   database=args.database)
+    mydb.insert_data_in_batches(num_samples=args.samples)
     
-    datagen = db_creation.DataGenerator(num_samples=args.samples)
-    dataframe_data = datagen.generate_random_data()
-    dataframe_data.to_csv(os.path.join(os.getcwd(), "..", "specification-files", "randomData.csv"), index=False)
 
 if __name__ == "__main__":
     main()
