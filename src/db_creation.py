@@ -1,3 +1,22 @@
+"""
+This Python module is designed to facilitate the generation, management, and simulation of microbiome-related data,
+encompassing functionalities for creating mock data sets that mimic real-world microbiome sample data, patient information,
+and microorganism characteristics. This data can be used for testing, analysis, and development purposes in bioinformatics
+and microbiome research projects.
+
+Documentation within this module adheres to PEP 257 docstring conventions, ensuring clarity and consistency across
+descriptions and making the codebase more accessible and maintainable.
+
+Authors:
+    - Carmen Rodríguez González
+    - Mario Pascual González
+    - Gonzalo Mesas Aranda
+
+This code was developed to fulfill an assignment for the final project in the "Biological Data Bases" course.
+"""
+
+
+
 from typing import List
 import mysql.connector as mysql
 import random
@@ -11,8 +30,31 @@ from datetime import datetime, timedelta
 
 
 class DbCreation:
+    """
+    A class to manage database creation, schema setup, data insertion, and deletion for a microbiome database.
+
+    Attributes:
+        password (str): The password to connect to the MySQL database.
+        database (str): The name of the database (schema) to be created and managed.
+
+    Methods:
+        __init__(self, password: str, database: str): Initializes the database connection and sets up the schema.
+        __schema__(self): Establishes a connection to MySQL and creates the database if it does not exist.
+        __creation__(self): Creates the necessary tables within the database.
+        insert_data_in_batches(self, num_samples: int): Inserts data into the database in batches.
+        _insert_dataframe_to_db(self, df, cursor): Inserts data from a DataFrame into the database.
+        drop_db(self): Drops the database schema.
+    """
     
     def __init__(self, password: str, database: str) -> None:
+        """
+        Initializes the DbCreation instance, establishes a database connection,
+        and sets up the schema and tables if they do not already exist.
+
+        Args:
+            password (str): The password for the MySQL database connection.
+            database (str): The name of the database (schema) to create and manage.
+        """
         self.password = password
         self.database = database
         # Stablish a connection. If the schema has 
@@ -21,6 +63,10 @@ class DbCreation:
         self.__creation__()
         
     def __schema__(self) -> None:
+        """
+        Establishes a database connection and creates the database if it does not exist.
+        Prints connection status and any errors encountered.
+        """
         print("Establishing connection...")
         try:
             connection = mysql.connect(
@@ -36,6 +82,11 @@ class DbCreation:
                 connection.close()
     
     def __creation__(self) -> None:
+        """
+        Creates the necessary tables within the database if they do not already exist.
+        Defines tables for patients, samples, microorganisms, and sample-microorganism relationships.
+        Prints any errors encountered during the table creation process.
+        """
         connection= None
         try:
             connection = mysql.connect(
@@ -87,6 +138,13 @@ class DbCreation:
                 connection.close() 
      
     def insert_data_in_batches(self, num_samples: int) -> None:
+        """
+        Inserts data into the database in batches. Generates data using the DataGenerator class
+        and inserts it in batches for efficiency.
+
+        Args:
+            num_samples (int): The total number of samples to generate and insert into the database.
+        """
         batch_size = 100
         num_batches = (num_samples + batch_size - 1) // batch_size 
 
@@ -119,6 +177,14 @@ class DbCreation:
                 connection.close()             
     
     def _insert_dataframe_to_db(self, df, cursor):
+        """
+        Inserts data from a DataFrame into the database using the provided cursor. Data is inserted
+        into the patient, sample, microorganism, and sample_microorganism tables.
+
+        Args:
+            df (DataFrame): The DataFrame containing the data to insert.
+            cursor (MySQLCursor): The cursor to use for executing SQL queries.
+        """
         patient_insert_query = """
         INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease) 
         VALUES (%s, %s, %s, %s, %s, %s) 
@@ -163,6 +229,11 @@ class DbCreation:
             cursor.execute(sample_microorganism_insert_query, sample_microorganism_data)
 
     def drop_db(self) -> None:
+        """
+        Drops the database schema, effectively deleting all data and structures within the database.
+
+        Prints the status of the operation and any errors encountered.
+        """
         try:
             connection = mysql.connect(
                     host="localhost",
@@ -180,18 +251,54 @@ class DbCreation:
                 connection.close()        
             
 class DataGenerator:
+    """
+    A class for generating random data related to microbiome samples, including microorganism,
+    patient, and sample data.
+
+    Attributes:
+        num_samples (int): The number of samples to generate.
+        seed (int): The seed value for random number generation to ensure reproducibility.
+
+    Methods:
+        __init__(self, num_samples: int, seed: int): Initializes the data generator with a specific number of samples and a seed.
+        __generateMicroorganismData__(self) -> tuple: Generates random data for microorganisms.
+        __generatePatientData__(self) -> list: Generates random data for patients.
+        __generateSampleData__(self): Generates random data for samples.
+        generate_single_row(self) -> list: Generates a single row of combined data from microorganisms, patients, and samples.
+        generate_random_data(self, i: int): Generates random data for the specified number of samples and batches it for insertion.
+    """
+    
     def __init__(self, num_samples: int, seed: int):
+        """
+        Initializes the DataGenerator instance with the specified number of samples and seed value.
+
+        Args:
+            num_samples (int): The total number of data samples to generate.
+            seed (int): The seed value for random number generators to ensure reproducibility.
+        """
         self.num_samples = num_samples
         random.seed(seed) # ensure reproducibility
         np.random.seed(seed)
         
         
     def __generateMicroorganismData__(self) -> str:
+        """
+        Generates random data for a microorganism, including its ID, kingdom, species, and diseases.
+
+        Returns:
+            tuple: A tuple containing the microorganism ID, kingdom, species, and diseases.
+        """
         csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
         row = csv.iloc[np.random.randint(0, csv.shape[0]), :]
         return row.loc["Microorganism_ID"], row.loc["Kingdom"], row.loc["Species"], row.loc["Diseases"].split(",")[np.random.randint(0, len(row.loc["Diseases"].split(",")))]
     
     def __generatePatientData__(self) -> List:
+        """
+        Generates random data for a patient, including ID, age, birth method, location, and activity level.
+
+        Returns:
+            list: A list containing the patient's ID, age, birth method, location, and activity level.
+        """
         def patient_id():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
@@ -214,6 +321,12 @@ class DataGenerator:
         ]
         
     def __generateSampleData__(self):
+        """
+        Generates random data for a sample, including sample ID, collection date, body part, and sample type.
+
+        Returns:
+            tuple: A tuple containing the sample ID, collection date, body part, and sample type.
+        """
         def sample_id():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
@@ -236,6 +349,12 @@ class DataGenerator:
         
     
     def generate_single_row(self) -> List:
+        """
+        Generates a single row of data by combining information from microorganisms, patients, and samples.
+
+        Returns:
+            list: A list containing combined data from a microorganism, patient, and sample.
+        """
         Microorganism_ID, Kingdom, Species, Diseases = self.__generateMicroorganismData__()
         Fasta = "seq_" + Microorganism_ID + ".fasta"
         Seq_length = np.random.randint(1000000, 100000000)
@@ -247,6 +366,16 @@ class DataGenerator:
                 Date, Body_Part, Sample_Type, Microorganism_ID, Species, Kingdom, Fasta, Seq_length, qPCR]
 
     def generate_random_data(self, i: int):
+        """
+        Generates random data for a specified number of samples. Data is generated in parallel
+        and combined into a DataFrame.
+
+        Args:
+            i (int): An index representing the current batch of data generation, used for tracking in parallel execution.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the generated data for the specified number of samples.
+        """
         rows = []
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.generate_single_row) for _ in range(self.num_samples)]
