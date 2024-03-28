@@ -160,6 +160,8 @@ class DbCreation:
             seed = 42
             i = 0
             for _ in tqdm(range(num_batches), desc="Inserting batches"):
+                
+                    
                 datagen = DataGenerator(num_samples=batch_size,
                                         seed=seed)
                 df = datagen.generate_random_data(i=i)  
@@ -194,7 +196,7 @@ class DbCreation:
         Location=VALUES(Location), 
         Lifestyle=VALUES(Lifestyle), 
         Disease=VALUES(Disease)"""
-
+        # 2
         sample_insert_query = """
         INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
         VALUES (%s, %s, %s, %s, %s) 
@@ -202,8 +204,8 @@ class DbCreation:
         Date=VALUES(Date), 
         Body_Part=VALUES(Body_Part), 
         Sample_Type=VALUES(Sample_Type)"""
-
-        microorganism_insert_query = """
+        # 1
+        microorganism_insert_query = """ 
         INSERT INTO microorganism (Microorganism_ID, Species, Kingdom, FASTA, Seq_length) 
         VALUES (%s, %s, %s, %s, %s) 
         ON DUPLICATE KEY UPDATE 
@@ -211,7 +213,7 @@ class DbCreation:
         Kingdom=VALUES(Kingdom), 
         FASTA=VALUES(FASTA), 
         Seq_length=VALUES(Seq_length)"""
-
+        # 3
         sample_microorganism_insert_query = """
         INSERT INTO sample_microorganism (Microorganism_ID, Sample_ID, qPCR) 
         VALUES (%s, %s, %s) 
@@ -227,6 +229,9 @@ class DbCreation:
             cursor.execute(sample_insert_query, sample_data)
             cursor.execute(microorganism_insert_query, microorganism_data)
             cursor.execute(sample_microorganism_insert_query, sample_microorganism_data)
+            
+            
+            
 
     def drop_db(self) -> None:
         """
@@ -279,8 +284,7 @@ class DataGenerator:
         self.num_samples = num_samples
         random.seed(seed) # ensure reproducibility
         np.random.seed(seed)
-        
-        
+            
     def __generateMicroorganismData__(self) -> str:
         """
         Generates random data for a microorganism, including its ID, kingdom, species, and diseases.
@@ -299,11 +303,11 @@ class DataGenerator:
         Returns:
             list: A list containing the patient's ID, age, birth method, location, and activity level.
         """
-        def patient_id():
+        def generatePatientID():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
             return f'PAC-{numbers}-{letters}'
-
+        
         delivery_methods = ['Cesarean', 'Natural']
         locations = [
             'Europe', 'Africa', 'North America', 'South America', 
@@ -313,25 +317,26 @@ class DataGenerator:
         activity_levels = ['Active', 'Sedentary']
 
         return [
-            patient_id(), # Patient ID
+            generatePatientID(),
             random.randint(0, 100),  # Age
             random.choice(delivery_methods),  # Birth
             random.choice(locations),  # Localization
             random.choice(activity_levels)  # Activity levels
         ]
+    
+    
         
-    def __generateSampleData__(self):
+    def generateSampleData(self):
         """
         Generates random data for a sample, including sample ID, collection date, body part, and sample type.
 
         Returns:
             tuple: A tuple containing the sample ID, collection date, body part, and sample type.
         """
-        def sample_id():
+        def generateSampleID():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
             return f'SMP-{numbers}-{letters}'
-
         def random_date(start, end):
             delta = end - start
             int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
@@ -345,7 +350,7 @@ class DataGenerator:
         body_part = random.choice(body_parts)
         sample_type = random.choice(sample_types)
 
-        return sample_id(), date, body_part, sample_type   
+        return generateSampleID(), date, body_part, sample_type   
         
     
     def generate_single_row(self) -> List:
