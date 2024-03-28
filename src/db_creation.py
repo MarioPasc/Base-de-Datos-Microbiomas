@@ -17,7 +17,7 @@ This code was developed to fulfill an assignment for the final project in the "B
 
 
 
-from typing import List, Tuple
+from typing import List
 import mysql.connector as mysql
 import random
 import string
@@ -167,7 +167,7 @@ class DbCreation:
 
                 datagen = DataGenerator(num_samples=batch_size,
                                         seed=seed)
-                sample_df, patients_df= datagen.generate_random_data2(i=i) 
+                sample_df, patients_df= datagen.generate_random_data(i=i) 
                 self._insert_patient_to_db (patients_df,cursor) 
                 self._insert_sample_to_db(sample_df, cursor) 
                 connection.commit()
@@ -183,6 +183,14 @@ class DbCreation:
                 connection.close()
     
     def _insert_microorganism_to_db(self, cursor):
+        """
+        Inserts data from a CSV file into the database using the provided cursor. Data is inserted
+        into the  microorganism tables.
+
+        Args:
+            cursor: The total number of samples to generate and insert into the database.
+        """
+                
         microorganism_insert_query = """
         INSERT INTO microorganism (Microorganism_ID, Species, Kingdom, FASTA, Seq_length) 
         VALUES (%s, %s, %s, %s, %s) 
@@ -192,6 +200,7 @@ class DbCreation:
         FASTA=VALUES(FASTA), 
         Seq_length=VALUES(Seq_length)"""
 
+        # csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
         csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
         
         for _, row in csv.iterrows():
@@ -203,6 +212,14 @@ class DbCreation:
 
 
     def _insert_sample_to_db(self, df, cursor):
+        """
+        Inserts data from a dataframe into the database using the provided cursor. Data is inserted
+        into the  sample and sample_microorganism tables.
+
+        Args:
+            cursor: The total number of samples to generate and insert into the database.
+            df (dataframe): The DataFrame containing the data to insert.
+        """
         sample_insert_query = """
         INSERT INTO sample (Sample_ID, Patient_ID, Date, Body_Part, Sample_Type) 
         VALUES (%s, %s, %s, %s, %s) 
@@ -227,6 +244,14 @@ class DbCreation:
 
             
     def _insert_patient_to_db(self, df, cursor):
+        """
+        Inserts data from a dataframe into the database using the provided cursor. Data is inserted
+        into the patient tables.
+
+        Args:
+            cursor: The total number of samples to generate and insert into the database.
+            df (dataframe): The DataFrame containing the data to insert.
+        """
         patient_insert_query = """
         INSERT INTO patient (Patient_ID, Age, Birth_Type, Location, Lifestyle, Disease, Sex) 
         VALUES (%s, %s, %s, %s, %s, %s, %s) 
@@ -294,8 +319,7 @@ class DataGenerator:
         self.num_samples = num_samples
         random.seed(seed) # ensure reproducibility
         np.random.seed(seed)
-
-    #intentar aprovechar el método para las insercciones??       
+      
     def __generateMicroorganismData__(self) -> str:
         """
         Generates random data for a microorganism, including its ID and diseases.
@@ -303,8 +327,9 @@ class DataGenerator:
         Returns:
             tuple: A tuple containing the microorganism ID and diseases.
         """
+        #csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
         csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
-        #le he tenido que quitar los dos puntos???
+
         row = csv.iloc[np.random.randint(0, csv.shape[0]), :]
         return row.loc["Microorganism_ID"], row.loc["Diseases"].split(",")[np.random.randint(0, len(row.loc["Diseases"].split(",")))]
     
@@ -367,7 +392,17 @@ class DataGenerator:
         
     
     
-    def generate_rows(self, patient_id):
+    def generate_sample_rows(self, patient_id):
+        """
+        Generates random data for a specified number of samples. 
+
+        Args:
+            patient_id (string): The patient id for the samples
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the generated data for the samples.
+            List: A list with the possible diseases for the patient.
+        """
         rows=[]
         disease_list=[]
         Sample_ID, Date, Body_Part, Sample_Type = self.__generateSampleData__()
@@ -383,16 +418,30 @@ class DataGenerator:
 
 
     
-    def generate_random_data2(self, i: int):
+    def generate_random_data(self, i: int):
+        """
+        Generates random data for a specified number of samples. Data is generated in parallel
+        and combined into a DataFrame.
+
+        Args:
+            i (int): An index representing the current batch of data generation, used for tracking in parallel execution.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the generated data for the patient.
+            pd.DataFrame: A DataFrame containing the generated data for the samples.
+        """
         rows=[]
         #generate all the patient 
         patients_data=[]
         while len(patients_data) < self.num_samples:
             Patient_ID, Age, Birth, Localization, Activity_Levels, Sex = self.__generatePatientData__()
+            #generate a random number of samples for each patient
             for _ in range(random.randint(0, self.num_samples*2//self.num_samples)):  
-                data, disease_list = self.generate_rows(Patient_ID)
+                data, disease_list = self.generate_sample_rows(Patient_ID)
+                #get a random disease amoung the possible diseases.
                 Disease= random.choice(disease_list)
                 patients_data.append([Patient_ID, Age, Birth, Localization, Activity_Levels, Disease, Sex])
+                #add all the list of data to rows list
                 rows.extend(data)
 
 
