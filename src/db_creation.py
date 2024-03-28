@@ -340,11 +340,11 @@ class DataGenerator:
         Returns:
             list: A list containing the patient's ID, age, birth method, location, and activity level.
         """
-        def generatePatientID():
+        def patient_id():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
             return f'PAC-{numbers}-{letters}'
-        
+
         delivery_methods = ['Cesarean', 'Natural']
         locations = [
             'Europe', 'Africa', 'North America', 'South America', 
@@ -355,27 +355,26 @@ class DataGenerator:
         sex= ['M','F']
 
         return [
-            generatePatientID(),
+            patient_id(), # Patient ID
             random.randint(0, 100),  # Age
             random.choice(delivery_methods),  # Birth
             random.choice(locations),  # Localization
             random.choice(activity_levels),  # Activity levels
             random.choice(sex) #Sex
         ]
-    
-    
         
-    def generateSampleData(self):
+    def __generateSampleData__(self):
         """
         Generates random data for a sample, including sample ID, collection date, body part, and sample type.
 
         Returns:
             tuple: A tuple containing the sample ID, collection date, body part, and sample type.
         """
-        def generateSampleID():
+        def sample_id():
             numbers = ''.join(random.choices(string.digits, k=5))
             letters = ''.join(random.choices(string.ascii_uppercase, k=3))
             return f'SMP-{numbers}-{letters}'
+
         def random_date(start, end):
             delta = end - start
             int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
@@ -389,7 +388,7 @@ class DataGenerator:
         body_part = random.choice(body_parts)
         sample_type = random.choice(sample_types)
 
-        return generateSampleID(), date, body_part, sample_type   
+        return sample_id(), date, body_part, sample_type   
         
     
     
@@ -453,4 +452,3 @@ class DataGenerator:
             "Patient_ID", "Age", "Birth_Type", "Location", "Lifestyle", "Disease", "Sex"])
         
         return sample_df, patients_df
-
