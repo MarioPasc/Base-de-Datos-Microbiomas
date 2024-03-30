@@ -65,7 +65,7 @@ class Queries:
     
 
     def __query3__(self, disease: str):
-        #List the patient who suffer a certain disease and their asociated samples.
+        #List the patients who suffer a certain disease and their associated samples.
         query='''SELECT p.Patient_ID, s.Sample_ID, s.Date, s.Body_Part, s.Sample_Type
                             FROM patient p, sample s 
                             WHERE  p.Patient_ID = s.Patient_ID AND p.Disease = %s
@@ -84,11 +84,11 @@ class Queries:
     def __query5__(self):
         #number of times a microorganism appears in the same sample type 
 
-        query='''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(qPCR)
+        query='''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(qPCR), STDDEV(qPCR)
                 FROM sample s, sample_microorganism sm
                 WHERE s.Sample_ID= sm.Sample_ID
                 GROUP BY s.Sample_Type, sm.Microorganism_ID
-                ORDER BY s.Sample_Type DESC;'''
+                ORDER BY sm.Microorganism_ID DESC;'''
         self.__query_format__(query,(),5)
  
     def __query6__(self):
