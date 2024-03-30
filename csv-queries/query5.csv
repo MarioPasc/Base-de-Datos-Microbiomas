@@ -1,7 +1,4 @@
-M,i,c,r,o,o,r,g,a,n,i,s,m,_,I,D
-S,a,m,p,l,e,_,T,y,p,e
-S,a,m,p,l,e,_,C,o,u,n,t
-A,V,G,(,q,P,C,R,)
+Microorganism_ID,Sample_Type,Sample_Count,AVG(qPCR)
 MIC-17098-ZUZ,Urine,5,480.4000
 MIC-21174-VEX,Urine,6,332.3333
 MIC-21714-ZMU,Urine,5,592.0000

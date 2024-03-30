@@ -3,6 +3,8 @@ import time
 import mysql.connector as mysql
 import csv
 
+import pandas as pd
+
 class Queries:
     def __init__(self, password: str, database: str) -> None:
         self.password = password
@@ -27,9 +29,8 @@ class Queries:
         try:
             start_time= time.time()
             cursor.execute(query, argument)
-            
-            col_name= [d[0] for d in cursor.description]
             result= cursor.fetchall()
+            col_name= [d[0] for d in cursor.description]
             final_time = time.time() - start_time
             print("This query as take ",final_time, " s")
             self.__export_csv__(result,col_name, "query"+str(num_qury)+".csv")
@@ -115,10 +116,9 @@ class Queries:
 
     def __export_csv__(self, result,col_name, file_name: str):
         file_path = os.path.join(os.getcwd(),"csv-queries", file_name)
-        csvfile=open(file_path, 'w', newline='')
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerows(col_name)
-        csv_writer.writerows(result)
+        df = pd.DataFrame.from_records(result, columns=col_name)
+        df.to_csv(file_path, index=False)
+
 
         
      
