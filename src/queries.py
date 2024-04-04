@@ -30,10 +30,11 @@ class Queries:
             start_time= time.time()
             cursor.execute(query, argument)
             result= cursor.fetchall()
-            col_name= [d[0] for d in cursor.description]
             final_time = time.time() - start_time
-            print("This query as take ",final_time, " s")
+            col_name= [d[0] for d in cursor.description]
+            #print("This query as take ",final_time, " s")
             self.__export_csv__(result,col_name, "query"+str(num_qury)+".csv")
+            return final_time
         except mysql.Error as err:
             print(f"Error: {err}")
         finally:
@@ -50,7 +51,7 @@ class Queries:
                             GROUP BY p.Patient_ID
                             ORDER BY Num_Microorganisms DESC
                             LIMIT 10;'''
-        self.__query_format__(query,(),1)
+        return self.__query_format__(query,(),1)
 
 
     def __query2__(self, microorganism_ID: str):
@@ -60,7 +61,7 @@ class Queries:
                             FROM sample_microorganism sm
                             WHERE sm.Microorganism_ID = %s 
                             ORDER BY sm.qPCR DESC;'''
-        self.__query_format__(query, (microorganism_ID,),2)
+        return self.__query_format__(query, (microorganism_ID,),2)
         
     
 
@@ -70,7 +71,7 @@ class Queries:
                             FROM patient p, sample s 
                             WHERE  p.Patient_ID = s.Patient_ID AND p.Disease = %s
                             ORDER BY s.Date;'''
-        self.__query_format__(query,(disease,),3)
+        return self.__query_format__(query,(disease,),3)
 
 
     def __query4__(self):
@@ -79,17 +80,17 @@ class Queries:
                             FROM sample s
                             GROUP BY s.Sample_Type
                             ORDER BY Sample_Count DESC;'''
-        self.__query_format__(query,(),4)
+        return self.__query_format__(query,(),4)
     
     def __query5__(self):
         #number of times a microorganism appears in the same sample type 
 
-        query='''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(qPCR), STDDEV(qPCR)
+        query='''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(sm.qPCR), STDDEV(sm.qPCR)
                 FROM sample s, sample_microorganism sm
                 WHERE s.Sample_ID= sm.Sample_ID
                 GROUP BY s.Sample_Type, sm.Microorganism_ID
                 ORDER BY sm.Microorganism_ID DESC;'''
-        self.__query_format__(query,(),5)
+        return self.__query_format__(query,(),5)
  
     def __query6__(self):
         #Find patients who suffer from and have been diagnosed with hepatitis B and have the hepatitis B virus in their microbiome and the qPCR of this microorganism
@@ -103,15 +104,15 @@ class Queries:
                                                                     m.Species='Hepatitis B Virus'
                                                             GROUP BY s.Patient_ID) s1
                 WHERE s1.Patient_ID=p1.Patient_ID;'''
-        self.__query_format__(query,(),6)
+        return self.__query_format__(query,(),6)
 
     def __query7__(self):
-        # Find microorganism of the same species with difference sequence length.
+        # Find microorganism of the same species with different sequence length.
         query='''SELECT Species, COUNT(*) AS Count, AVG(Seq_length) AS avg_SeqLength
                 FROM microorganism
                 GROUP BY Species
                 HAVING Count>1;'''
-        self.__query_format__(query,(),7)
+        return self.__query_format__(query,(),7)
 
 
     def __export_csv__(self, result,col_name, file_name: str):
