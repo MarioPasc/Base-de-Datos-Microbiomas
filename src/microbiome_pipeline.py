@@ -1,7 +1,5 @@
 import argparse
 import db_creation
-import pandas
-import os
 
 def main():
     parser = argparse.ArgumentParser(description="Connect to a MySQL database using Python.")
