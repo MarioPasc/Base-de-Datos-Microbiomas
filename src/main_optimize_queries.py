@@ -38,12 +38,11 @@ def main():
     t1=time_query2()
     print("Initial time: ", str(t1))
 
-    #CREATE INDEX query2_index ON sample_microorganism(Microorganism_ID, qPCR);
     alter.__add_index__("sample_microorganism",["Microorganism_ID","qPCR"])
     t2=time_query2()
     print("Time with new index: ",str(t2))
     if(t2>t1):
-        #elimnar el indice
+        #drop index if the response time is worse
         alter.__drop_index__("sample_microorganism",["Microorganism_ID","qPCR"])
     
             
@@ -64,13 +63,13 @@ def main():
 
     print("Query 3")
     
-    #change Disease type to VARCHAR(30)
+    #change Disease type to VARCHAR(30), since is not possible to make a type TEXT index
     alter.__alter_type__("patient","Disease","VARCHAR (30)")
     t1=time_query3()
     print("Initial time: ", str(t1))
-    #utiliza primary para sample pero no utiliza indice para patient
 
-    #PROBLEMA: por algun motivo cambia este nuevo indice por el que había de FK y luego no se puede quitar
+
+
     alter.__add_index__("sample",["Patient_ID","date"])
     t2=time_query3()
     print("Index sample table: ", str(t2))
@@ -100,7 +99,6 @@ def main():
     t2=time_query4()
     print("Time with new index: ",str(t2))
     if(t2>t1):
-        #elimnar el indice
         alter.__drop_index__("sample",["Sample_Type"])
 
 
@@ -118,7 +116,8 @@ def main():
     alter.__add_index__("sample",["Sample_Type","Sample_ID"])
     t2=time_query5()
     print("Index sample table: ", str(t2))
-    alter.__drop_index__("sample",["Sample_Type","Sample_ID"])
+    if(t2>t1):
+        alter.__drop_index__("sample",["Sample_Type","Sample_ID"])
 
 
     
@@ -130,7 +129,6 @@ def main():
         return time/20
 
     print("Query 7")
-    alter.__drop_index__("microorganism",["Species"])
     t1=time_query7()
     print("Initial time: ", str(t1))
     
@@ -140,8 +138,8 @@ def main():
     alter.__add_index__("microorganism",["Species"])
     t2=time_query7()
     print("Index sample table: ", str(t2))
-
-    #
+    if(t2>t1):
+        alter.__drop_index__("microorganism",["Species"])
 
 
 if __name__ == "__main__":
