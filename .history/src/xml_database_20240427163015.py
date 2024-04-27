@@ -1,6 +1,5 @@
 from lxml import etree
 import mysql.connector as mysql 
-import datetime
 def connect(password, database):
         try:
             connection = mysql.connect(
@@ -30,6 +29,7 @@ def generate_xml(password, database):
         # Crear elemento por cada paciente
         patient_elem = etree.SubElement(root, 'patient')
         etree.SubElement(patient_elem, 'Patient_ID').text = str(paciente[0])
+        print(paciente[0])
         etree.SubElement(patient_elem, 'Age').text = str(paciente[1])
         etree.SubElement(patient_elem, 'Birth_Type').text = paciente[2]
         etree.SubElement(patient_elem, 'Location').text = paciente[3]
@@ -45,25 +45,23 @@ def generate_xml(password, database):
         for muestra in muestras:
             sample_elem = etree.SubElement(samples_elem, 'sample')
             etree.SubElement(sample_elem, 'Sample_ID').text = str(muestra[0])
-            # Skip [1] for patient id
-            fecha = muestra[2]
-            etree.SubElement(sample_elem, 'Date').text = fecha.strftime("%Y-%m-%d")
+            etree.SubElement(sample_elem, 'Date').text = muestra[2]
             etree.SubElement(sample_elem, 'Body_Part').text = muestra[3]
             etree.SubElement(sample_elem, 'Sample_Type').text = muestra[4]
 
             # Asumimos que hay una tabla para microorganismos en cada muestra
-            cursor.execute(f"SELECT m.Microorganism_ID, m.FASTA, m.Kingdom, m.Species, m.Seq_length, sm.qPCR FROM microorganism m, sample_microorganism sm WHERE sm.Microorganism_ID=m.Microorganism_ID  AND sm.Sample_ID = '{muestra[0]}'")
+            cursor.execute(f"SELECT m.Microorganism_ID, m.FASTA, m.Kingdom, m.Species, m.Seq_length, sm.qPCR FROM microorganism m, sample_microorganism sm WHERE sm.Microorganism_ID=m.Microorganism_ID  AND sm.Sample_ID = {muestra['ID']}")
             micros = cursor.fetchall()
             micros_elem = etree.SubElement(sample_elem, 'lista_microorganismo')
             
             for micro in micros:
                 micro_elem = etree.SubElement(micros_elem, 'microorganism')
-                etree.SubElement(micro_elem, 'Microorganism_ID').text = str(micro[0])
-                etree.SubElement(micro_elem, 'Species').text = micro[3]
-                etree.SubElement(micro_elem, 'Kingdom').text = micro[2]
-                etree.SubElement(micro_elem, 'FASTA').text = micro[1]
-                etree.SubElement(micro_elem, 'Seq_length').text = str(micro[4])
-                etree.SubElement(micro_elem, 'qPCR').text = str(micro[5])
+                etree.SubElement(micro_elem, 'Microorganism_ID').text = str(micro['Microorganism_ID'])
+                etree.SubElement(micro_elem, 'Species').text = micro['Species']
+                etree.SubElement(micro_elem, 'Kingdom').text = micro['Kingdom']
+                etree.SubElement(micro_elem, 'FASTA').text = micro['FASTA']
+                etree.SubElement(micro_elem, 'Seq_length').text = micro['Seq_length']
+                etree.SubElement(micro_elem, 'qPCR').text = micro['qPCR']
 
     # Convertir el árbol XML en una cadena y guardarla en un archivo
     tree = etree.ElementTree(root)

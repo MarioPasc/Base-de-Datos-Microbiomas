@@ -57,13 +57,14 @@ def generate_xml(password, database):
             micros_elem = etree.SubElement(sample_elem, 'lista_microorganismo')
             
             for micro in micros:
+                print(micro)
                 micro_elem = etree.SubElement(micros_elem, 'microorganism')
                 etree.SubElement(micro_elem, 'Microorganism_ID').text = str(micro[0])
                 etree.SubElement(micro_elem, 'Species').text = micro[3]
                 etree.SubElement(micro_elem, 'Kingdom').text = micro[2]
                 etree.SubElement(micro_elem, 'FASTA').text = micro[1]
-                etree.SubElement(micro_elem, 'Seq_length').text = str(micro[4])
-                etree.SubElement(micro_elem, 'qPCR').text = str(micro[5])
+                etree.SubElement(micro_elem, 'Seq_length').text = micro[4]
+                etree.SubElement(micro_elem, 'qPCR').text = micro[5]
 
     # Convertir el árbol XML en una cadena y guardarla en un archivo
     tree = etree.ElementTree(root)

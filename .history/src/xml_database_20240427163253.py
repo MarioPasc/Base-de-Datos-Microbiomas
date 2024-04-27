@@ -46,8 +46,7 @@ def generate_xml(password, database):
             sample_elem = etree.SubElement(samples_elem, 'sample')
             etree.SubElement(sample_elem, 'Sample_ID').text = str(muestra[0])
             # Skip [1] for patient id
-            fecha = muestra[2]
-            etree.SubElement(sample_elem, 'Date').text = fecha.strftime("%Y-%m-%d")
+            etree.SubElement(sample_elem, 'Date').text = muestra[2]
             etree.SubElement(sample_elem, 'Body_Part').text = muestra[3]
             etree.SubElement(sample_elem, 'Sample_Type').text = muestra[4]
 
@@ -58,12 +57,12 @@ def generate_xml(password, database):
             
             for micro in micros:
                 micro_elem = etree.SubElement(micros_elem, 'microorganism')
-                etree.SubElement(micro_elem, 'Microorganism_ID').text = str(micro[0])
-                etree.SubElement(micro_elem, 'Species').text = micro[3]
-                etree.SubElement(micro_elem, 'Kingdom').text = micro[2]
-                etree.SubElement(micro_elem, 'FASTA').text = micro[1]
-                etree.SubElement(micro_elem, 'Seq_length').text = str(micro[4])
-                etree.SubElement(micro_elem, 'qPCR').text = str(micro[5])
+                etree.SubElement(micro_elem, 'Microorganism_ID').text = str(micro['Microorganism_ID'])
+                etree.SubElement(micro_elem, 'Species').text = micro['Species']
+                etree.SubElement(micro_elem, 'Kingdom').text = micro['Kingdom']
+                etree.SubElement(micro_elem, 'FASTA').text = micro['FASTA']
+                etree.SubElement(micro_elem, 'Seq_length').text = micro['Seq_length']
+                etree.SubElement(micro_elem, 'qPCR').text = micro['qPCR']
 
     # Convertir el árbol XML en una cadena y guardarla en un archivo
     tree = etree.ElementTree(root)
