@@ -54,7 +54,7 @@ def generate_xml(password, database):
             # Asumimos que hay una tabla para microorganismos en cada muestra
             cursor.execute(f"SELECT m.Microorganism_ID, m.FASTA, m.Kingdom, m.Species, m.Seq_length, sm.qPCR FROM microorganism m, sample_microorganism sm WHERE sm.Microorganism_ID=m.Microorganism_ID  AND sm.Sample_ID = '{muestra[0]}'")
             micros = cursor.fetchall()
-            micros_elem = etree.SubElement(sample_elem, 'lista_microorganismo')
+            micros_elem = etree.SubElement(sample_elem, 'microorganism_list')
             
             for micro in micros:
                 micro_elem = etree.SubElement(micros_elem, 'microorganism')
