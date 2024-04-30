@@ -1,0 +1,146 @@
+Query 1
+Find the patient with the most diverse microbiome.
+
+return
+<patients>{
+let $patients :=
+    for $x in doc("microbiome.xml")/microbiome/patient
+    let $num_mic := count(distinct-values($x/sample_list/sample/microorganism_list/microorganism/Microorganism_ID))
+    order by $num_mic descending
+    return
+        <patient>
+            {$x/Patient_ID}
+            <num_distinct_microorganism>{$num_mic}</num_distinct_microorganism>
+        </patient>
+return
+    subsequence($patients, 1, 10)
+}</patients>
+---------------------------------------------------------------------
+Query 2
+Given a microorganism , identify the samples in which it is present and its
+concentration.
+
+xquery version "1.0";
+
+declare namespace ext="http://www.altova.com/xslt-extensions";
+
+let $doc := doc("C:/Users/Gonzalo_MA/Desktop/Universidad/Tercero/Bases de datos biologicas/Parte Ismael/PROYECTO/microbiome.xml")/microbiome
+
+return
+<solution>
+{
+    for $microorganism in $doc/patient/sample_list/sample/microorganism_list/microorganism
+    where $microorganism/Microorganism_ID = "MIC-21714-ZMU"
+    return 
+    <presentIn>
+        <sample>{data($microorganism/../../Sample_ID)}</sample>
+        <qPCR>{data($microorganism/qPCR)}</qPCR>
+    </presentIn>
+}
+</solution>
+---------------------------------------------------------------------
+Query 3
+Patients who suffer a certain disease and their associated samples.
+
+return
+<patients>{let $disease := "Herpes simplex"
+for $p in doc("microbiome.xml")/microbiome/patient
+where $p/Disease=$disease
+return 
+    <patient>
+        {$p/Patient_ID}
+        <samples>
+            {
+                for $s in $p/sample_list/sample
+                order by $s/Date descending
+                return
+                    <sample>
+                       {$s/Sample_ID}
+                       {$s/Date}
+                       {$s/Sample_Type}
+                       {$s/Body_Part}
+                    </sample>
+            }
+        </samples>
+    </patient> 
+}</patients>
+---------------------------------------------------------------------
+Query 4
+Number of Samples per type of sample.
+
+xquery version "1.0";
+
+declare namespace ext="http://www.altova.com/xslt-extensions";
+
+let $doc := doc("C:/Users/Gonzalo_MA/Desktop/Universidad/Tercero/Bases de datos biologicas/Parte Ismael/PROYECTO/microbiome.xml")/microbiome
+
+return
+<solution>
+{
+	for $sample_type in distinct-values($doc//Sample_Type)
+	let $count := count($doc//Sample_Type[. = $sample_type])
+	return <sample_type>{concat("Sample_Type: ", $sample_type, ", Apariciones: ", $count)}</sample_type>
+}
+</solution>
+---------------------------------------------------------------------
+Query 5
+Number of times a microorganism appears in the same sample type.
+
+return
+<microorganisms>{
+for $m_id in distinct-values($doc/patient/sample_list/sample/microorganism_list/microorganism/Microorganism_ID)
+let $m := $doc/patient/sample_list/sample/microorganism_list/microorganism[Microorganism_ID = $m_id]
+return 
+    <microorganism>
+        <Microorganism_ID>{$m_id}</Microorganism_ID> 
+        {
+            for $st in distinct-values($m/../../Sample_Type)
+            let $count := count($m[../../Sample_Type = $st])
+            let $avg_qpcr := avg($m[../../Sample_Type = $st]/qPCR)
+            return 
+                <type>
+                    <Sample_Type>{$st}</Sample_Type>
+                    <Count>{$count}</Count>
+                    <avg_qPCR>{$avg_qpcr}</avg_qPCR>
+                </type>
+        }
+    </microorganism>
+}</microorganisms>
+---------------------------------------------------------------------
+Query 6
+Find the patients who suffer from and have been diagnosed with hepatitis B
+and have the hepatitis B virus in their microbiome.
+
+xquery version "1.0";
+
+declare namespace ext="http://www.altova.com/xslt-extensions";
+
+let $doc := doc("C:/Users/Gonzalo_MA/Desktop/Universidad/Tercero/Bases de datos biologicas/Parte Ismael/PROYECTO/microbiome.xml")/microbiome
+
+return
+<patients>
+{
+	for $patient in $doc/patient
+	where contains($patient/Disease, "Hepatitis B") and (some $aux in $patient/sample_list/sample/microorganism_list/microorganism/Species 	satisfies contains($aux, "Hepatitis B virus"))
+	return <patient>{data($patient/Patient_ID)}</patient>
+}
+</patients>
+---------------------------------------------------------------------
+Query 7
+Find species of microorganism with different sequence registered.
+
+return
+<Microorganism_Species>{
+for $species in distinct-values(doc("microbiome.xml")/microbiome/patient/sample_list/sample/microorganism_list/microorganism/Species)
+let $microorganisms := distinct-values(doc("microbiome.xml")/microbiome/patient/sample_list/sample/microorganism_list/microorganism[Species = $species]/Microorganism_ID)
+let $c := count($microorganisms)
+where $c>1
+return 
+    <species>
+        <Species>{$species}</Species>
+        <Count>{$c}</Count>
+        <Avg_seq_length>{avg(for $m in $microorganisms
+                         let $sl:= distinct-values(doc("microbiome.xml")/microbiome/patient/sample_list/sample/microorganism_list/microorganism[Microorganism_ID=$m]/Seq_length)
+                         return $sl)}</Avg_seq_length>
+    </species>
+}</Microorganism_Species>
