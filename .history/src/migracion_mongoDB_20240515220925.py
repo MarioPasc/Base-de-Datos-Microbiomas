@@ -216,14 +216,14 @@ class MongoDBAggregations:
             unique=True
         )
 
-        pipeline2 = [
+        pipeline = [
             {
                 "$set": {
                     '_id': "$microorganism_id"
                 }
             },
             {
-                "$unset": 'microorganism_id'
+                "$unset": 'microorganism_ID'
             },
             {
                 "$out": {
@@ -232,7 +232,7 @@ class MongoDBAggregations:
                 }
             }
         ]
-        collection_microbiome_object.aggregate(pipeline=pipeline2)
+        collection_microbiome_object.aggregate(pipeline=pipeline)
 
     def get_patient_with_most_distinct_microorganisms(self, collection_patient: str) -> Dict[str, Any]:
         collection_patient_object = self.db.get_collection(collection_patient)

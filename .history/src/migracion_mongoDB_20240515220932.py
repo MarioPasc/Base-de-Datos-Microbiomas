@@ -223,7 +223,7 @@ class MongoDBAggregations:
                 }
             },
             {
-                "$unset": 'microorganism_id'
+                "$unset": 'microorganism_ID'
             },
             {
                 "$out": {
