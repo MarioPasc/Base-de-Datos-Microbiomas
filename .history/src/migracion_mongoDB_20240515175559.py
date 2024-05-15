@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 import mysql.connector
 import json
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from datetime import date
 import pandas as pd
 from tqdm import tqdm

@@ -1,7 +1,7 @@
 from typing import List, Dict, Any
 import mysql.connector
 import json
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from datetime import date
 import pandas as pd
 from tqdm import tqdm
@@ -174,8 +174,8 @@ class MongoDBAggregations:
             }
         ]
         collection_patient_object.aggregate(pipeline=pipeline)
-                
-        collection_patient_object.create_index(
+        
+                collection_patient_object.create_index(
             [('samples.sample_id', ASCENDING)], 
             unique=True
         )

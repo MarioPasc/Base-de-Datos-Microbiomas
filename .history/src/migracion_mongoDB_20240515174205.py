@@ -1,10 +1,10 @@
 from typing import List, Dict, Any
 import mysql.connector
 import json
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from datetime import date
 import pandas as pd
-from tqdm import tqdm
+
 
 class Microorganism:
     def __init__(self, microorganism_id: str, qpcr: int, sample_id: str):
@@ -149,13 +149,12 @@ class JSONExporter:
 
 class MongoDBAggregations:
     def __init__(self, mongo_uri: str, db_name: str) -> None:
-        self.client = MongoClient(mongo_uri)
-        self.db = self.client.get_database(db_name)
+        self.mongo_uri = mongo_uri
         self.db_name = db_name
         
     def configure_collections(self, collection_microbiome:str, collection_patient:str) -> None:
-        collection_microbiome_object = self.db.get_collection(collection_microbiome)
-        collection_patient_object = self.db.get_collection(collection_patient)
+        collection_microbiome = self.db_name[collection_microbiome]
+        collection_patient = self.db_name[collection_patient]
         
         pipeline =  [
             {
@@ -173,30 +172,7 @@ class MongoDBAggregations:
                 }
             }
         ]
-        collection_patient_object.aggregate(pipeline=pipeline)
-                
-        collection_patient_object.create_index(
-            [('samples.sample_id', ASCENDING)], 
-            unique=True
-        )
-        
-        pipeline = [
-            {
-                "$set": {
-                    '_id': '$Microorganism_ID'
-                }
-            },
-            {
-                "$unset": 'Microorganism_ID'
-            },
-            {
-                "$out": {
-                    "db": self.db_name,
-                    "coll": collection_microbiome
-                }
-            }
-        ]
-        collection_microbiome_object.aggregate(pipeline=pipeline)
+        collection_patient.aggregate(pipeline)
 
 def main():
     mysql_config = {
@@ -250,13 +226,6 @@ def main():
     # Insert CSV data into MongoDB
     csv_file = './specification-files/microorganisms.csv'
     exporter.insert_csv_to_mongodb(csv_file, microorganism_collection)
-    
-    # Aggregations
-    mongo = MongoDBAggregations(mongo_uri=mongo_uri, db_name=db_name)
-    
-    mongo.configure_collections(collection_microbiome=microorganism_collection,
-                                collection_patient=collection_name)
-
 
 if __name__ == "__main__":
     main()

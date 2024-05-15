@@ -1,10 +1,10 @@
 from typing import List, Dict, Any
 import mysql.connector
 import json
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from datetime import date
 import pandas as pd
-from tqdm import tqdm
+
 
 class Microorganism:
     def __init__(self, microorganism_id: str, qpcr: int, sample_id: str):
@@ -174,10 +174,14 @@ class MongoDBAggregations:
             }
         ]
         collection_patient_object.aggregate(pipeline=pipeline)
-                
+        
         collection_patient_object.create_index(
-            [('samples.sample_id', ASCENDING)], 
-            unique=True
+            {
+                'sample.sample_id': 1
+            },
+            {
+                'unique': True
+            }
         )
         
         pipeline = [
@@ -198,7 +202,7 @@ class MongoDBAggregations:
         ]
         collection_microbiome_object.aggregate(pipeline=pipeline)
 
-def main():
+def main2():
     mysql_config = {
         'host': 'localhost',
         'user': 'root',
@@ -250,13 +254,20 @@ def main():
     # Insert CSV data into MongoDB
     csv_file = './specification-files/microorganisms.csv'
     exporter.insert_csv_to_mongodb(csv_file, microorganism_collection)
+
+def main() -> int:
+        
+    mongo_uri = "mongodb+srv://pascualgonzalezmario:admin@cluster0.emhrxxc.mongodb.net/"
+    db_name = 'BDB2023'
+    collection_name = 'Patients'
+    microorganism_collection = 'Microorganism'
     
-    # Aggregations
     mongo = MongoDBAggregations(mongo_uri=mongo_uri, db_name=db_name)
     
     mongo.configure_collections(collection_microbiome=microorganism_collection,
                                 collection_patient=collection_name)
-
+    
+    return 0
 
 if __name__ == "__main__":
     main()
