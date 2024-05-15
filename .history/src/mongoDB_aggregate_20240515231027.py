@@ -209,7 +209,7 @@ class MongoDBAggregations:
                         }, {
                             '$match': {
                                 'total': {
-                                    '$gt': 1
+                                    '$gt': 0
                                 }
                             }
                         }

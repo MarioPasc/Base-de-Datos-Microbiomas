@@ -268,9 +268,7 @@ def main() -> int:
                                                                                   microorganism_kingdom='Virus')
     print(results)
     print("\n")
-    print("QUERY 7: Find species of microorganism with different sequence registered \n")
-    results = mongo.get_species_of_microorganism_with_different_sequence(collection_microorganisms=microorganism_collection)
-    print(results)
+    print("QUERY 7: Find species of microorganism with different sequence registered")
     
     return 0
 

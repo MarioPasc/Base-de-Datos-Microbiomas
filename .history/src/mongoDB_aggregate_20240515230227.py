@@ -193,30 +193,6 @@ class MongoDBAggregations:
         results = list(collection_patients_object.aggregate(pipeline=pipeline))
         return results[:2] if results else {}
         
-    def get_species_of_microorganism_with_different_sequence(self, collection_microorganisms:str):
-        collection_microorganisms_object = self.db[collection_microorganisms]
-        pipeline = [
-                        {
-                            '$group': {
-                                '_id': '$species', 
-                                'average': {
-                                    '$avg': '$seq_length'
-                                }, 
-                                'total': {
-                                    '$sum': 1
-                                }
-                            }
-                        }, {
-                            '$match': {
-                                'total': {
-                                    '$gt': 1
-                                }
-                            }
-                        }
-                    ]
-        results = list(collection_microorganisms_object.aggregate(pipeline=pipeline))
-        return results[:3] if results else {}
-        
     def update_patient_location(self, collection_name: str, patient_id: str, new_location: str) -> None:
         collection = self.db.get_collection(collection_name)
         result = collection.update_one(
@@ -268,10 +244,6 @@ def main() -> int:
                                                                                   microorganism_kingdom='Virus')
     print(results)
     print("\n")
-    print("QUERY 7: Find species of microorganism with different sequence registered \n")
-    results = mongo.get_species_of_microorganism_with_different_sequence(collection_microorganisms=microorganism_collection)
-    print(results)
-    
     return 0
 
 if __name__ == "__main__":
