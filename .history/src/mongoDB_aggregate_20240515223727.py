@@ -139,12 +139,12 @@ class MongoDBAggregations:
         result = list(collection_patient_object.aggregate(pipeline))
         return result[0] if result else {}
     
-    def get_patients_diagnosed_with_disease_and_microorganism_disease(self, collection_patients:str, disease:str, microorganism_kingdom:str):
+    def get_patients_diagnosed_with_disease_and_microorganism_disease(self, collection_patients:str, disease:str):
         collection_patients_object = self.db[collection_patients]
         pipeline = [
                         {
                             '$match': {
-                                'disease': disease
+                                'disease': 'Hepatitis B'
                             }
                         }, {
                             '$unwind': {
@@ -170,14 +170,11 @@ class MongoDBAggregations:
                             }
                         }, {
                             '$match': {
-                                'microorganism_info.kingdom': microorganism_kingdom
+                                'microorganism_info.Kingdom': 'Virus'
                             }
                         }, {
                             '$match': {
-                                "microorganism_info.species": {
-                                    "$regex": "Hepatitis B",
-                                    "$options": "i" 
-                                }
+                                'microorganism_info.Diseases': 'Hepatitis B'
                             }
                         }, {
                             '$project': {
@@ -220,12 +217,6 @@ def main() -> int:
     print("\n")
     print("QUERY 5: Number of times a microorganism appears in the same sample type: \n")
     results = mongo.get_microorganism_per_sample_type(collection_patient=collection_patients)
-    print(results)
-    print("\n")
-    print("QUERY 6: Patients who suffer from and have been diagnosed with a disease and have that disease microorganism \n")
-    results = mongo.get_patients_diagnosed_with_disease_and_microorganism_disease(collection_patients=collection_patients,
-                                                                                  disease='Hepatitis B',
-                                                                                  microorganism_kingdom='Virus')
     print(results)
     print("\n")
     return 0

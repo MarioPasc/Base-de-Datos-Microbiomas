@@ -170,14 +170,11 @@ class MongoDBAggregations:
                             }
                         }, {
                             '$match': {
-                                'microorganism_info.kingdom': microorganism_kingdom
+                                'microorganism_info.Kingdom': microorganism_kingdom
                             }
                         }, {
                             '$match': {
-                                "microorganism_info.species": {
-                                    "$regex": "Hepatitis B",
-                                    "$options": "i" 
-                                }
+                                'microorganism_info.Diseases': disease
                             }
                         }, {
                             '$project': {
@@ -220,12 +217,6 @@ def main() -> int:
     print("\n")
     print("QUERY 5: Number of times a microorganism appears in the same sample type: \n")
     results = mongo.get_microorganism_per_sample_type(collection_patient=collection_patients)
-    print(results)
-    print("\n")
-    print("QUERY 6: Patients who suffer from and have been diagnosed with a disease and have that disease microorganism \n")
-    results = mongo.get_patients_diagnosed_with_disease_and_microorganism_disease(collection_patients=collection_patients,
-                                                                                  disease='Hepatitis B',
-                                                                                  microorganism_kingdom='Virus')
     print(results)
     print("\n")
     return 0

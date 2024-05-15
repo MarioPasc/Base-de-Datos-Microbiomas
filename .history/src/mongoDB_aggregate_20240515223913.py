@@ -170,14 +170,11 @@ class MongoDBAggregations:
                             }
                         }, {
                             '$match': {
-                                'microorganism_info.kingdom': microorganism_kingdom
+                                'microorganism_info.Kingdom': microorganism_kingdom
                             }
                         }, {
                             '$match': {
-                                "microorganism_info.species": {
-                                    "$regex": "Hepatitis B",
-                                    "$options": "i" 
-                                }
+                                'microorganism_info.Diseases': disease
                             }
                         }, {
                             '$project': {

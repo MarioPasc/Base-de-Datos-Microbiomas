@@ -170,7 +170,7 @@ class MongoDBAggregations:
                             }
                         }, {
                             '$match': {
-                                'microorganism_info.kingdom': microorganism_kingdom
+                                'microorganism_info.Kingdom': microorganism_kingdom
                             }
                         }, {
                             '$match': {

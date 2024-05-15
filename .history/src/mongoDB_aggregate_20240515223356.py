@@ -139,60 +139,6 @@ class MongoDBAggregations:
         result = list(collection_patient_object.aggregate(pipeline))
         return result[0] if result else {}
     
-    def get_patients_diagnosed_with_disease_and_microorganism_disease(self, collection_patients:str, disease:str, microorganism_kingdom:str):
-        collection_patients_object = self.db[collection_patients]
-        pipeline = [
-                        {
-                            '$match': {
-                                'disease': disease
-                            }
-                        }, {
-                            '$unwind': {
-                                'path': '$samples', 
-                                'includeArrayIndex': 'string'
-                            }
-                        }, {
-                            '$unwind': {
-                                'path': '$samples.microorganisms', 
-                                'includeArrayIndex': 'string'
-                            }
-                        }, {
-                            '$lookup': {
-                                'from': 'Microorganism', 
-                                'localField': 'samples.microorganisms.microorganism_id', 
-                                'foreignField': '_id', 
-                                'as': 'microorganism_info'
-                            }
-                        }, {
-                            '$unwind': {
-                                'path': '$microorganism_info', 
-                                'includeArrayIndex': 'string'
-                            }
-                        }, {
-                            '$match': {
-                                'microorganism_info.kingdom': microorganism_kingdom
-                            }
-                        }, {
-                            '$match': {
-                                "microorganism_info.species": {
-                                    "$regex": "Hepatitis B",
-                                    "$options": "i" 
-                                }
-                            }
-                        }, {
-                            '$project': {
-                                '_id': '$_id', 
-                                'patient_disease': '$disease', 
-                                'microorganism': '$microorganism_info._id', 
-                                'species': '$microorganism_info.Species', 
-                                'sample_id': '$samples.sample_id', 
-                                'qpcr': '$samples.microorganisms.qpcr'
-                            }
-                        }
-                    ]
-        results = list(collection_patients_object.aggregate(pipeline=pipeline))
-        return results[:2] if results else {}
-    
 def main() -> int:
     mongo_uri = "mongodb+srv://pascualgonzalezmario:admin@cluster0.emhrxxc.mongodb.net/"
     db_name = 'BDB2023'
@@ -220,12 +166,6 @@ def main() -> int:
     print("\n")
     print("QUERY 5: Number of times a microorganism appears in the same sample type: \n")
     results = mongo.get_microorganism_per_sample_type(collection_patient=collection_patients)
-    print(results)
-    print("\n")
-    print("QUERY 6: Patients who suffer from and have been diagnosed with a disease and have that disease microorganism \n")
-    results = mongo.get_patients_diagnosed_with_disease_and_microorganism_disease(collection_patients=collection_patients,
-                                                                                  disease='Hepatitis B',
-                                                                                  microorganism_kingdom='Virus')
     print(results)
     print("\n")
     return 0
