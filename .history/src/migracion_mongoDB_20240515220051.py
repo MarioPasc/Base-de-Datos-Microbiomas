@@ -168,8 +168,8 @@ class JSONExporter:
         with open(output_file, 'w') as file:
             json.dump(data, file, indent=4)
             
-    def export_to_json_microorganisms(self, microorganisms: List[Microorganism], output_file:str) -> None:
-        data = [microorganism.to_dict() for microorganism in microorganisms]
+    def export_to_josn_microorganisms(self, microorganisms: List[Microorganism], output_file:str) -> None:
+        data = [microorganisms.to_dict() for patient in microorganisms]
         with open(output_file, 'w') as file:
             json.dump(data, file, indent=4)
 
@@ -219,11 +219,11 @@ class MongoDBAggregations:
         pipeline = [
             {
                 "$set": {
-                    '_id': '$microorganism_ID'
+                    '_id': '$Microorganism_ID'
                 }
             },
             {
-                "$unset": 'microorganism_ID'
+                "$unset": 'Microorganism_ID'
             },
             {
                 "$out": {
@@ -351,7 +351,7 @@ def main():
     output_file_patient = './specification-files/patients_data.json'
     output_file_microorganisms = './specification-files/microorganisms.json'
     exporter.export_to_json(patients=patients, output_file=output_file_patient)
-    exporter.export_to_json_microorganisms(microorganisms=microorganisms, 
+    exporter.export_to_josn_microorganisms(microorganisms=microorganisms, 
                                            output_file=output_file_microorganisms)
     exporter.insert_patients_to_mongodb(patients, patients_collection)
     exporter.insert_microorganisms_to_mongodb(microorganisms, microorganism_collection)

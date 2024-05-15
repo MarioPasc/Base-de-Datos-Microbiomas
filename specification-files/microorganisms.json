@@ -1,0 +1,177 @@
+[
+    {
+        "microorganism_id": "MIC-17098-ZUZ",
+        "species": "Bordetella pertussis",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-17098-ZUZ.fasta",
+        "seq_length": 74262141
+    },
+    {
+        "microorganism_id": "MIC-21174-VEX",
+        "species": "Vibrio cholerae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-21174-VEX.fasta",
+        "seq_length": 23354337
+    },
+    {
+        "microorganism_id": "MIC-21714-ZMU",
+        "species": "Shigella spp.",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-21714-ZMU.fasta",
+        "seq_length": 7693807
+    },
+    {
+        "microorganism_id": "MIC-21822-ASC",
+        "species": "Legionella pneumophila",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-21822-ASC.fasta",
+        "seq_length": 23962059
+    },
+    {
+        "microorganism_id": "MIC-23829-AZV",
+        "species": "Salmonella typhi",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-23829-AZV.fasta",
+        "seq_length": 61757624
+    },
+    {
+        "microorganism_id": "MIC-27185-JQD",
+        "species": "Human immunodeficiency virus",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-27185-JQD.fasta",
+        "seq_length": 12217069
+    },
+    {
+        "microorganism_id": "MIC-29463-HLU",
+        "species": "Neisseria gonorrhoeae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-29463-HLU.fasta",
+        "seq_length": 73651751
+    },
+    {
+        "microorganism_id": "MIC-29910-WWS",
+        "species": "Hepatitis C virus",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-29910-WWS.fasta",
+        "seq_length": 14745695
+    },
+    {
+        "microorganism_id": "MIC-31140-RIJ",
+        "species": "Herpes simplex virus type 1",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-31140-RIJ.fasta",
+        "seq_length": 2234302
+    },
+    {
+        "microorganism_id": "MIC-33366-MDC",
+        "species": "Mycobacterium tuberculosis",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-33366-MDC.fasta",
+        "seq_length": 59649394
+    },
+    {
+        "microorganism_id": "MIC-36334-TJK",
+        "species": "Staphylococcus aureus",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-36334-TJK.fasta",
+        "seq_length": 20733861
+    },
+    {
+        "microorganism_id": "MIC-48434-UTS",
+        "species": "Herpes simplex virus type 2",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-48434-UTS.fasta",
+        "seq_length": 13713897
+    },
+    {
+        "microorganism_id": "MIC-49404-GMV",
+        "species": "Human papillomavirus",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-49404-GMV.fasta",
+        "seq_length": 62151274
+    },
+    {
+        "microorganism_id": "MIC-54855-XTQ",
+        "species": "Plasmodium falciparum",
+        "kingdom": "Protozoa",
+        "fasta": "seq_MIC-54855-XTQ.fasta",
+        "seq_length": 59028704
+    },
+    {
+        "microorganism_id": "MIC-56906-SSY",
+        "species": "Pseudomonas aeruginosa",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-56906-SSY.fasta",
+        "seq_length": 29204417
+    },
+    {
+        "microorganism_id": "MIC-58889-GAT",
+        "species": "Clostridium tetani",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-58889-GAT.fasta",
+        "seq_length": 9724757
+    },
+    {
+        "microorganism_id": "MIC-61432-DQS",
+        "species": "Klebsiella pneumoniae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-61432-DQS.fasta",
+        "seq_length": 96332089
+    },
+    {
+        "microorganism_id": "MIC-63271-ZJV",
+        "species": "Streptococcus pyogenes",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-63271-ZJV.fasta",
+        "seq_length": 97327691
+    },
+    {
+        "microorganism_id": "MIC-64254-KRV",
+        "species": "Haemophilus influenzae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-64254-KRV.fasta",
+        "seq_length": 74537271
+    },
+    {
+        "microorganism_id": "MIC-65290-TFD",
+        "species": "Hepatitis B virus",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-65290-TFD.fasta",
+        "seq_length": 9823870
+    },
+    {
+        "microorganism_id": "MIC-77893-GDC",
+        "species": "Streptococcus pneumoniae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-77893-GDC.fasta",
+        "seq_length": 39122214
+    },
+    {
+        "microorganism_id": "MIC-79464-FIL",
+        "species": "Escherichia coli",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-79464-FIL.fasta",
+        "seq_length": 18837083
+    },
+    {
+        "microorganism_id": "MIC-90008-XPF",
+        "species": "Mycoplasma pneumoniae",
+        "kingdom": "Bacteria",
+        "fasta": "seq_MIC-90008-XPF.fasta",
+        "seq_length": 3974995
+    },
+    {
+        "microorganism_id": "MIC-91695-NFU",
+        "species": "Candida albicans",
+        "kingdom": "Fungi",
+        "fasta": "seq_MIC-91695-NFU.fasta",
+        "seq_length": 70274032
+    },
+    {
+        "microorganism_id": "MIC-94902-RPG",
+        "species": "Varicella-zoster virus",
+        "kingdom": "Virus",
+        "fasta": "seq_MIC-94902-RPG.fasta",
+        "seq_length": 47144118
+    }
+]

@@ -167,11 +167,6 @@ class JSONExporter:
         data = [patient.to_dict() for patient in patients]
         with open(output_file, 'w') as file:
             json.dump(data, file, indent=4)
-            
-    def export_to_json_microorganisms(self, microorganisms: List[Microorganism], output_file:str) -> None:
-        data = [microorganism.to_dict() for microorganism in microorganisms]
-        with open(output_file, 'w') as file:
-            json.dump(data, file, indent=4)
 
     def insert_patients_to_mongodb(self, patients: List[Patient], collection: str) -> None:
         collection_object = self.db[collection]
@@ -219,11 +214,11 @@ class MongoDBAggregations:
         pipeline = [
             {
                 "$set": {
-                    '_id': '$microorganism_ID'
+                    '_id': '$Microorganism_ID'
                 }
             },
             {
-                "$unset": 'microorganism_ID'
+                "$unset": 'Microorganism_ID'
             },
             {
                 "$out": {
@@ -312,8 +307,8 @@ def main():
 
     mongo_uri = "mongodb+srv://pascualgonzalezmario:admin@cluster0.emhrxxc.mongodb.net/"
     db_name = 'BDB2023'
-    patients_collection = 'Patients'
-    microorganism_collection = 'Microorganism'
+    collection_name = 'Patients'
+    microorganism_collection = 'Microorganisms'
 
     extractor = DatabaseExtractor(mysql_config)
     extractor.connect()
@@ -348,19 +343,16 @@ def main():
     extractor.disconnect()
 
     exporter = JSONExporter(mongo_uri, db_name)
-    output_file_patient = './specification-files/patients_data.json'
-    output_file_microorganisms = './specification-files/microorganisms.json'
-    exporter.export_to_json(patients=patients, output_file=output_file_patient)
-    exporter.export_to_json_microorganisms(microorganisms=microorganisms, 
-                                           output_file=output_file_microorganisms)
-    exporter.insert_patients_to_mongodb(patients, patients_collection)
+    output_file = './specification-files/patients_data.json'
+    exporter.export_to_json(patients, output_file)
+    exporter.insert_patients_to_mongodb(patients, collection_name)
     exporter.insert_microorganisms_to_mongodb(microorganisms, microorganism_collection)
 
     # Aggregations
     mongo = MongoDBAggregations(mongo_uri=mongo_uri, db_name=db_name)
 
     mongo.configure_collections(collection_microbiome=microorganism_collection,
-                                collection_patient=patients_collection)
+                                collection_patient=collection_name)
 
 if __name__ == "__main__":
     main()
