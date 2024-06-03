@@ -12,7 +12,7 @@ def main():
                         type=int, help='Number of rows to insert', required=True)
     args = parser.parse_args()
     
-    mydb = DbCreation(password=args.password, 
+    mydb = mysql_dbCreation.DbCreation(password=args.password, 
                                   database=args.database)
     mydb.insert_data_in_batches(num_samples=args.samples)
     

@@ -71,9 +71,8 @@ class Queries:
 
     def query1(self):
         query = '''SELECT p.Patient_ID, COUNT(DISTINCT sm.Microorganism_ID) AS Num_Microorganisms
-                   FROM patient p
-                   JOIN sample s ON p.Patient_ID = s.Patient_ID
-                   JOIN sample_microorganism sm ON s.Sample_ID = sm.Sample_ID
+                   FROM patient p, sample s, sample_microorganism sm
+                   WHERE p.Patient_ID = s.Patient_ID AND s.Sample_ID = sm.Sample_ID
                    GROUP BY p.Patient_ID
                    ORDER BY Num_Microorganisms DESC
                    LIMIT 10;'''
@@ -88,9 +87,8 @@ class Queries:
 
     def query3(self, disease: str):
         query = '''SELECT p.Patient_ID, s.Sample_ID, s.Date, s.Body_Part, s.Sample_Type
-                   FROM patient p
-                   JOIN sample s ON p.Patient_ID = s.Patient_ID
-                   WHERE p.Disease = %s
+                   FROM patient p, sample s 
+                   WHERE p.Patient_ID = s.Patient_ID AND p.Disease = %s
                    ORDER BY s.Date;'''
         return self.__query_format(query, (disease,), 3)
 
@@ -102,9 +100,9 @@ class Queries:
         return self.__query_format(query, (), 4)
     
     def query5(self):
-        query = '''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(sm.qPCR) AS avg_qPCR, STDDEV(sm.qPCR) AS stddev_qPCR
-                   FROM sample s
-                   JOIN sample_microorganism sm ON s.Sample_ID = sm.Sample_ID
+        query = '''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(sm.qPCR), STDDEV(sm.qPCR)
+                   FROM sample s, sample_microorganism sm
+                   WHERE s.Sample_ID = sm.Sample_ID
                    GROUP BY s.Sample_Type, sm.Microorganism_ID
                    ORDER BY sm.Microorganism_ID DESC;'''
         return self.__query_format(query, (), 5)
@@ -113,21 +111,21 @@ class Queries:
         query = '''SELECT p1.Patient_ID, s1.Max_qPCR
                    FROM (SELECT p.Patient_ID
                          FROM patient p
-                         WHERE p.Disease='Hepatitis B') p1
-                   JOIN (SELECT s.Patient_ID, MAX(sm.qPCR) AS Max_qPCR
-                         FROM sample s
-                         JOIN sample_microorganism sm ON s.Sample_ID = sm.Sample_ID
-                         JOIN microorganism m ON sm.Microorganism_ID = m.Microorganism_ID
-                         WHERE m.Species='Hepatitis B Virus'
+                         WHERE p.Disease='Hepatitis B') p1, 
+                        (SELECT s.Patient_ID, MAX(sm.qPCR) AS Max_qPCR
+                         FROM sample s, microorganism m, sample_microorganism sm
+                         WHERE s.Sample_ID = sm.Sample_ID 
+                           AND sm.Microorganism_ID = m.Microorganism_ID 
+                           AND m.Species='Hepatitis B Virus'
                          GROUP BY s.Patient_ID) s1
-                   ON s1.Patient_ID = p1.Patient_ID;'''
+                   WHERE s1.Patient_ID = p1.Patient_ID;'''
         return self.__query_format(query, (), 6)
 
     def query7(self):
         query = '''SELECT Species, COUNT(*) AS Count, AVG(Seq_length) AS avg_SeqLength
                    FROM microorganism
                    GROUP BY Species
-                   HAVING COUNT(*) > 1;'''
+                   HAVING Count > 1;'''
         return self.__query_format(query, (), 7)
 
     def __export_csv(self, result, col_name, file_name: str):

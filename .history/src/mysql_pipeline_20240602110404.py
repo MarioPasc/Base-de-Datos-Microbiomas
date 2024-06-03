@@ -1,5 +1,5 @@
 import argparse
-from mysql_dbCreation import DbCreation
+import src.mysql_dbCreation as mysql_dbCreation
 
 def main():
     parser = argparse.ArgumentParser(description="Connect to a MySQL database using Python.")
@@ -12,7 +12,7 @@ def main():
                         type=int, help='Number of rows to insert', required=True)
     args = parser.parse_args()
     
-    mydb = DbCreation(password=args.password, 
+    mydb = mysql_dbCreation.DbCreation(password=args.password, 
                                   database=args.database)
     mydb.insert_data_in_batches(num_samples=args.samples)
     

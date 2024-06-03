@@ -200,8 +200,8 @@ class DbCreation:
         FASTA=VALUES(FASTA), 
         Seq_length=VALUES(Seq_length)"""
 
-        csv = pd.read_csv(os.path.join(os.getcwd(), "..", "data-files", "microorganisms.csv"))
-        #csv = pd.read_csv(os.path.join(os.getcwd(), "data-files", "microorganisms.csv"))
+        csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
+        #csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
         
         for _, row in csv.iterrows():
             id= row["Microorganism_ID"]
@@ -327,8 +327,8 @@ class DataGenerator:
         Returns:
             tuple: A tuple containing the microorganism ID and diseases.
         """
-        csv = pd.read_csv(os.path.join(os.getcwd(), "..", "data-files", "microorganisms.csv"))
-        # csv = pd.read_csv(os.path.join(os.getcwd(), "data-files", "microorganisms.csv"))
+        csv = pd.read_csv(os.path.join(os.getcwd(), "..", "specification-files", "microorganisms.csv"))
+        # csv = pd.read_csv(os.path.join(os.getcwd(), "specification-files", "microorganisms.csv"))
 
         row = csv.iloc[np.random.randint(0, csv.shape[0]), :]
         return row.loc["Microorganism_ID"], row.loc["Diseases"].split(",")[np.random.randint(0, len(row.loc["Diseases"].split(",")))]
