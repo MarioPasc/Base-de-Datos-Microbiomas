@@ -47,7 +47,6 @@ class Queries:
         try:
             start_time = time.time()
             cursor.execute(query, argument)
-            print(f"Executing query {num_qry}")
             result = cursor.fetchall()
             final_time = time.time() - start_time
             col_name = [d[0] for d in cursor.description]
