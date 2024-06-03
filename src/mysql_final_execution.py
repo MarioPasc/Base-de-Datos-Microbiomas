@@ -18,8 +18,10 @@ def tiempo_query(n, query, n_query, df):
     return add_row(df, f"Q{n_query}", np.mean(tiempos))
 
 def main(n=50):
-    password = "bdbiO"
-    bd = "microbiomeDB"
+    #password = "bdbiO"
+    #bd = "microbiomeDB"
+    password = "654321"
+    bd = "microbiome_bd"
     
     connection = Queries(password, bd)
 
