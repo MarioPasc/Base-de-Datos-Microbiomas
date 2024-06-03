@@ -3,7 +3,7 @@ import time
 import itertools
 import pandas as pd
 from tqdm import tqdm
-from mongodb_queries import MongoDBAggregations
+from src.mongodb_queries import MongoDBAggregations
 
 def drop_indexes(db, collection_name):
     collection = db[collection_name]

@@ -177,9 +177,9 @@ def main():
     input_file = './query_optimization/mongodb/query_performance.csv'
     output_file = './query_optimization/mongodb/encoded_performance_mongodb.csv'
     encode_and_save_csv(input_file, output_file)
-    visualize_query_performance(output_file, "./query_optimization/")
-    save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
-    generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
+    #visualize_query_performance(output_file, "./query_optimization/")
+    #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
+    #generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
 
 if __name__ == "__main__":
     main()
