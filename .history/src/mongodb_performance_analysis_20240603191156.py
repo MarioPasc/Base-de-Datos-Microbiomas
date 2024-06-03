@@ -181,11 +181,10 @@ def comparison_heatmap(comparison_file_path):
 
     # Plotting the heatmap
     plt.figure(figsize=(10, 6))
-    sns.heatmap(heatmap_data.T, annot=True, fmt='g', cmap='YlGnBu', cbar=True)
+    sns.heatmap(heatmap_data.T, annot=True, cmap='YlGnBu', cbar=True)
     plt.title('Query 3 Comparison Heatmap')
     plt.xlabel('Index')
     plt.ylabel('Metrics')
-    plt.savefig("./query_optimization\mongodb\heatmap_query3_comparison.png")
     plt.show()
 
 def main():
@@ -195,7 +194,7 @@ def main():
     #visualize_query_performance(output_file, "./query_optimization/")
     #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
     #generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
-    comparison_heatmap(".\query_optimization\mongodb\query3_comparison.csv")
+    comparison_heatmap("query_optimization\mongodb\query3_comparison.csv")
 
 if __name__ == "__main__":
     main()

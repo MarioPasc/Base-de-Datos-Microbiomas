@@ -185,7 +185,6 @@ def comparison_heatmap(comparison_file_path):
     plt.title('Query 3 Comparison Heatmap')
     plt.xlabel('Index')
     plt.ylabel('Metrics')
-    plt.savefig("./query_optimization\mongodb\heatmap_query3_comparison.png")
     plt.show()
 
 def main():
