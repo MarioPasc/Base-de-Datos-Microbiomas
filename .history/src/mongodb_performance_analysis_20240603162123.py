@@ -146,7 +146,7 @@ def generate_heatmap(csv_path):
 
     data = pd.read_csv(csv_path)
     # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5']
+    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
 
     # Extract the relevant columns
     queries = data['Query'].unique()
@@ -178,8 +178,7 @@ def main():
     output_file = './query_optimization/mongodb/encoded_performance_mongodb.csv'
     #encode_and_save_csv(input_file, output_file)
     #visualize_query_performance(output_file, "./query_optimization/")
-    #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
-    generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
+    save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
 
 if __name__ == "__main__":
     main()

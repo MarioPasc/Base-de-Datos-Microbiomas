@@ -146,7 +146,7 @@ def generate_heatmap(csv_path):
 
     data = pd.read_csv(csv_path)
     # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5']
+    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
 
     # Extract the relevant columns
     queries = data['Query'].unique()

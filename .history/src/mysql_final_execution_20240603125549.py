@@ -57,10 +57,10 @@ if __name__ == "__main__":
     
     # Generación del gráfico de barras
     plt.figure(figsize=(10, 6))
-    plt.bar(df["Query"], df["Time"]/1000, color='skyblue')
+    plt.bar(df["Query"], df["Time"], color='skyblue')
     plt.title('Execution Time of Each Query')
     plt.xlabel('Query')
-    plt.ylabel('Time (s)')
+    plt.ylabel('Time (ms)')
     plt.grid(True)
-    plt.savefig("query_optimization/mysql/query_times_mysql.png")
+    plt.savefig("query_optimization/mysql/query_times.png")
     plt.show()

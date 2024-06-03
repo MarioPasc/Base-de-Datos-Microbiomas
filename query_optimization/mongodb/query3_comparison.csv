@@ -1,0 +1,4 @@
+Index, Time(ms), DocsReturned, DocsExamined
+None, 4, 163, 1990
+Disease, 2, 163, 163
+Disease+Microorganism_id, 2, 163, 163

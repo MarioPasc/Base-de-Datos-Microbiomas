@@ -142,11 +142,15 @@ def save_min_times(input_file: str, output_file: str):
     # Save the results to the output CSV file
     result_df.to_csv(output_file, index=False)
 
-def generate_heatmap(csv_path):
-
-    data = pd.read_csv(csv_path)
+def generate_heatmap(data):
+    """
+    Generate a heatmap showing which indices were used for each query.
+    
+    Parameters:
+    - data: DataFrame containing 'Query', 'Min_time', and 'Indexes' columns.
+    """
     # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5']
+    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
 
     # Extract the relevant columns
     queries = data['Query'].unique()
@@ -169,7 +173,7 @@ def generate_heatmap(csv_path):
     plt.title('Optimization Query Heatmap')
     plt.xlabel('Queries')
     plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mongodb/query_optimization_mongodb_heatmap.png")
+    plt.savefig("./query_optimization_mongodb_heatmap.png")
     plt.show()
 
 
@@ -178,8 +182,7 @@ def main():
     output_file = './query_optimization/mongodb/encoded_performance_mongodb.csv'
     #encode_and_save_csv(input_file, output_file)
     #visualize_query_performance(output_file, "./query_optimization/")
-    #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
-    generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
+    save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
 
 if __name__ == "__main__":
     main()

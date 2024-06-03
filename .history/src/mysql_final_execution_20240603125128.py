@@ -2,7 +2,6 @@ from mysql_queries import Queries
 import pandas as pd
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 
 # Función para añadir una nueva fila al DataFrame
 def add_row(df, query, time):
@@ -14,13 +13,15 @@ def tiempo_query(n, query, n_query, df):
     tiempos = []
     for _ in range(n):
         t = query 
-        tiempos += [t * 1000]  # Convertir a ms
-    return add_row(df, f"Q{n_query}", np.mean(tiempos))
+        tiempos += [t*1000]
+    return add_row(df, n_query, np.mean(tiempos))
 
-def main(n=50):
+def main(n = 50):
     password = "bdbiO"
     bd = "microbiomeDB"
-    
+    #password = "654321"
+    #bd = "microbiome_bd"
+
     connection = Queries(password, bd)
 
     # Crear un DataFrame vacío con columnas 'Query' y 'Time'
@@ -33,16 +34,16 @@ def main(n=50):
     for _ in range(n):
         microorganismo = random.choice(microorganismos)
         t = connection._query2__(microorganismo)
-        tiempos += [t * 1000]  # Convertir a ms
-    df = add_row(df, "Q2", np.mean(tiempos))
+        tiempos += [t*1000]
+    df = add_row(df, 2, np.mean(tiempos))
 
     diseases = ["Herpes simplex", "Tuberculosis", "Respiratory infections", "Tetanus"]
     tiempos = []
     for _ in range(n):
         disease = random.choice(diseases)
         t = connection._query3__(disease)    
-        tiempos += [t * 1000]  # Convertir a ms
-    df = add_row(df, "Q3", np.mean(tiempos))
+        tiempos += [t*1000]
+    df = add_row(df, 3, np.mean(tiempos))
 
     df = tiempo_query(n, connection._query4__(), 4, df)
     df = tiempo_query(n, connection._query5__(), 5, df)
@@ -55,12 +56,21 @@ if __name__ == "__main__":
     df = main()
     df.to_csv('./query_optimization/mysql/mysql_final_results.csv', index=False)
     
+    
+    import matplotlib.pyplot as plt
+
+    # Datos proporcionados
+    queries = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']
+    times_ms = [18.079280853271484, 1.4070367813110352, 1.5658807754516602, 
+                2.0580291748046875, 2.0020008087158203, 5.9986114501953125, 
+                4.001379013061523]
+
     # Generación del gráfico de barras
     plt.figure(figsize=(10, 6))
-    plt.bar(df["Query"], df["Time"]/1000, color='skyblue')
+    plt.bar(queries, times_ms, color='skyblue')
     plt.title('Execution Time of Each Query')
     plt.xlabel('Query')
-    plt.ylabel('Time (s)')
+    plt.ylabel('Time (ms)')
     plt.grid(True)
-    plt.savefig("query_optimization/mysql/query_times_mysql.png")
     plt.show()
+

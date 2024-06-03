@@ -113,6 +113,14 @@ def encode_and_save_csv(input_file, output_file):
     print(f"Encoded CSV saved to {output_file}")
 
 def save_min_times(input_file: str, output_file: str):
+    """
+    Process the input CSV file to find the minimum non-zero time for each query and the corresponding indices.
+    Save the results in the specified output CSV file.
+    
+    Parameters:
+    - input_file: Path to the input CSV file.
+    - output_file: Path to the output CSV file.
+    """
     # Load the data
     data = pd.read_csv(input_file)
     
@@ -142,44 +150,11 @@ def save_min_times(input_file: str, output_file: str):
     # Save the results to the output CSV file
     result_df.to_csv(output_file, index=False)
 
-def generate_heatmap(csv_path):
-
-    data = pd.read_csv(csv_path)
-    # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5']
-
-    # Extract the relevant columns
-    queries = data['Query'].unique()
-    binary_matrix = pd.DataFrame(0, index=indices, columns=queries)
-
-    # Fill the binary matrix
-    for idx, row in data.iterrows():
-        query = row['Query']
-        used_indices = row['Indexes'].split('+')
-        for index in used_indices:
-            if index in indices:
-                binary_matrix.at[index, query] = 1
-
-    # Add the "Total" column which is the sum of each row
-    binary_matrix['Total'] = binary_matrix.sum(axis=1)
-
-    # Plotting the heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(binary_matrix, annot=True, cmap='YlGnBu', cbar=True)
-    plt.title('Optimization Query Heatmap')
-    plt.xlabel('Queries')
-    plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mongodb/query_optimization_mongodb_heatmap.png")
-    plt.show()
-
-
 def main():
-    input_file = './query_optimization/mongodb/query_performance.csv'
-    output_file = './query_optimization/mongodb/encoded_performance_mongodb.csv'
+    input_file = './query_optimization/query_performance.csv'
+    output_file = './query_optimization/encoded_performance_mongodb.csv'
     #encode_and_save_csv(input_file, output_file)
     #visualize_query_performance(output_file, "./query_optimization/")
-    #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
-    generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
 
 if __name__ == "__main__":
     main()

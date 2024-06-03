@@ -62,5 +62,5 @@ if __name__ == "__main__":
     plt.xlabel('Query')
     plt.ylabel('Time (s)')
     plt.grid(True)
-    plt.savefig("query_optimization/mysql/query_times_mysql.png")
+    plt.savefig("query_optimization/mysql/query_times.png")
     plt.show()
