@@ -367,33 +367,35 @@ def find_minimum_times(csv_file_path):
     plt.close()
          
          
-def generate_heatmap(data):
-    # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
+def generate_heatmap(df):
+    # Extract the queries and index combinations
+    queries = df['Query']
+    index_combinations = df['Index Combination']
 
-    # Extract the relevant columns
-    queries = data['Query'].unique()
-    binary_matrix = pd.DataFrame(0, index=indices, columns=queries)
+    # Initialize a DataFrame to hold the binary matrix
+    index_names = [f'I{i}' for i in range(1, 11)]
+    binary_matrix = pd.DataFrame(0, index=index_names, columns=list(queries) + ['Total'])
 
-    # Fill the binary matrix
-    for idx, row in data.iterrows():
-        query = row['Query']
-        used_indices = row['Index Combination'].split('+')
-        for index in used_indices:
-            if index in indices:
-                binary_matrix.at[index, query] = 1
+    # Populate the binary matrix
+    for query, combination in zip(queries, index_combinations):
+        indices = combination.split('+')
+        for index in indices:
+            binary_matrix.at[index, query] = 1
 
-    # Add the "Total" column which is the sum of each row
+    # Calculate the total usage for each index
     binary_matrix['Total'] = binary_matrix.sum(axis=1)
 
-    # Plotting the heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(binary_matrix, annot=True, cmap='YlGnBu', cbar=True)
-    plt.title('Optimization Query Heatmap')
+    # Plot the heatmap
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(binary_matrix, annot=True, cmap='Blues', cbar=False)
+    plt.title('Index Optimization Heatmap')
     plt.xlabel('Queries')
     plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mysql/heatmap.png")
+    plt.xticks(rotation=45)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
     plt.show()
+
 
 # Ejecutar la función principal
 if __name__ == "__main__":
@@ -409,4 +411,4 @@ if __name__ == "__main__":
     #df_min_times = find_minimum_times("./query_optimization/mysql/mysql_optimization_results_encoded.csv")
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
-    generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
+    

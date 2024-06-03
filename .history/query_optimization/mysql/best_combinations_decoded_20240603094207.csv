@@ -1,0 +1,11 @@
+Unnamed: 0,Minimum Time (s),Query,Index Combination,Engine,Decoded Index Combination
+0,0.020707368850708,Q1,I2+I3+I4+I5+I7+I9,MEMORY,"sample(Patient_ID, sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, patient(Disease(255, sample(Sample_Type"
+1,0.0005083084106445,Q2,I1+I2+I3+I4+I5+I6+I7+I9,MyISAM,"patient(Patient_ID, sample(Patient_ID, sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, sample_microorganism(qPCR, patient(Disease(255, sample(Sample_Type"
+2,0.0008022785186767,Q3,I1+I2+I3+I4+I5+I6+I7+I10,MyISAM,"patient(Patient_ID, sample(Patient_ID, sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, sample_microorganism(qPCR, patient(Disease(255, microorganism(Species(255"
+3,0.0009961128234863,Q4,I1+I4+I7+I8+I9+I10,MEMORY,"patient(Patient_ID, sample_microorganism(Sample_ID, patient(Disease(255, sample(Date, sample(Sample_Type, microorganism(Species(255"
+4,0.0150136947631835,Q5,I3+I4+I5+I6+I9+I10,MEMORY,"sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, sample_microorganism(qPCR, sample(Sample_Type, microorganism(Species(255"
+5,0.0024309158325195,Q6,I5+I7+I10,MEMORY,"sample_microorganism(Microorganism_ID, patient(Disease(255, microorganism(Species(255"
+6,0.0005064010620117,Q7,I3+I4+I5+I7+I8,MEMORY,"sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, patient(Disease(255, sample(Date"
+7,0.0039842128753662,Q8,I2+I3+I6+I7+I9+I10,MEMORY,"sample(Patient_ID, sample(Sample_ID, sample_microorganism(qPCR, patient(Disease(255, sample(Sample_Type, microorganism(Species(255"
+8,0.0079975128173828,Q9,I1+I3+I4+I6+I7+I8+I9+I10,MEMORY,"patient(Patient_ID, sample(Sample_ID, sample_microorganism(Sample_ID, sample_microorganism(qPCR, patient(Disease(255, sample(Date, sample(Sample_Type, microorganism(Species(255"
+9,0.0159971714019775,Q10,I4+I5+I6+I7+I10,MEMORY,"sample_microorganism(Sample_ID, sample_microorganism(Microorganism_ID, sample_microorganism(qPCR, patient(Disease(255, microorganism(Species(255"

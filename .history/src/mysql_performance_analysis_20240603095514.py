@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import numpy as np
-from matplotlib_venn import venn2, venn3, venn3_circles, venn2_circles
+from matplotlib_venn import venn3, venn3_circles
 from venn import venn as venn_function
 
 
@@ -261,8 +261,53 @@ def find_minimum_times(csv_file_path):
     # Convert results to DataFrame
     min_times_df = pd.DataFrame(results)
     
-    return min_times_df    
+    return min_times_df    # Load the CSV file
+    df = pd.read_csv(csv_file_path)
 
+    # Convert the 'times' column from string to list of floats
+    df['times'] = df['times'].apply(eval)
+
+    # Explode the 'times' column to separate rows for each query
+    df_exploded = df.explode('times').reset_index(drop=True)
+
+    # Add a query identifier based on the position in the 'times' vector
+    df_exploded['query'] = df_exploded.groupby(['engine']).cumcount() % 10 + 1
+    df_exploded['query'] = 'Q' + df_exploded['query'].astype(str)
+
+    # Initialize a list to store the results
+    results = []
+
+    # Find the minimum execution time for each query, excluding 0.0 times if found
+    for query in df_exploded['query'].unique():
+        query_df = df_exploded[df_exploded['query'] == query]
+        min_time_row = query_df.loc[query_df['times'].idxmin()]
+        min_time = min_time_row['times']
+        
+        if min_time == 0.0:
+            # Find the second minimum time if the minimum time is 0.0
+            second_min_time_row = query_df[query_df['times'] > 0.0].nsmallest(1, 'times').iloc[0]
+            results.append({
+                'Minimum Time (s)': second_min_time_row['times'],
+                'Query': second_min_time_row['query'],
+                'Index Combination': second_min_time_row['indices'],
+                'Engine': second_min_time_row['engine']
+            })
+        else:
+            results.append({
+                'Minimum Time (s)': min_time_row['times'],
+                'Query': min_time_row['query'],
+                'Index Combination': min_time_row['indices'],
+                'Engine': min_time_row['engine']
+            })
+
+    # Convert results to DataFrame
+    min_times_df = pd.DataFrame(results)
+    
+    return min_times_df
+
+def create_venn_diagram(csv_path, output_dir, output_filename):
+    # Leer los datos desde el archivo CSV
+    data = pd.read_csv(csv_path)
 
     # Convertir las cadenas de índices en conjuntos
     index_sets = {row['Query']: set(row['Index Combination'].split('+')) for _, row in data.iterrows()}
@@ -365,35 +410,6 @@ def find_minimum_times(csv_file_path):
     plt.title("Diagrama de Venn de las queries seleccionadas")
     plt.savefig(output_path)
     plt.close()
-         
-         
-def generate_heatmap(data):
-    # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
-
-    # Extract the relevant columns
-    queries = data['Query'].unique()
-    binary_matrix = pd.DataFrame(0, index=indices, columns=queries)
-
-    # Fill the binary matrix
-    for idx, row in data.iterrows():
-        query = row['Query']
-        used_indices = row['Index Combination'].split('+')
-        for index in used_indices:
-            if index in indices:
-                binary_matrix.at[index, query] = 1
-
-    # Add the "Total" column which is the sum of each row
-    binary_matrix['Total'] = binary_matrix.sum(axis=1)
-
-    # Plotting the heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(binary_matrix, annot=True, cmap='YlGnBu', cbar=True)
-    plt.title('Optimization Query Heatmap')
-    plt.xlabel('Queries')
-    plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mysql/heatmap.png")
-    plt.show()
 
 # Ejecutar la función principal
 if __name__ == "__main__":
@@ -409,4 +425,5 @@ if __name__ == "__main__":
     #df_min_times = find_minimum_times("./query_optimization/mysql/mysql_optimization_results_encoded.csv")
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
-    generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
+    
+    create_venn_diagram("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/venn", "venn_diagram.png")

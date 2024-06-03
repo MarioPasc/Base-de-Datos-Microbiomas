@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import numpy as np
-from matplotlib_venn import venn2, venn3, venn3_circles, venn2_circles
-from venn import venn as venn_function
-
 
 # Función para codificar los índices
 def encode_indices(indices_str, indices_list):
@@ -225,9 +222,6 @@ def find_minimum_times(csv_file_path):
     # Explode the 'times' column to separate rows for each query
     df_exploded = df.explode('times').reset_index(drop=True)
 
-    # Convert the 'times' column to float
-    df_exploded['times'] = df_exploded['times'].astype(float)
-
     # Add a query identifier based on the position in the 'times' vector
     df_exploded['query'] = df_exploded.groupby(['engine']).cumcount() % 10 + 1
     df_exploded['query'] = 'Q' + df_exploded['query'].astype(str)
@@ -261,139 +255,7 @@ def find_minimum_times(csv_file_path):
     # Convert results to DataFrame
     min_times_df = pd.DataFrame(results)
     
-    return min_times_df    
-
-
-    # Convertir las cadenas de índices en conjuntos
-    index_sets = {row['Query']: set(row['Index Combination'].split('+')) for _, row in data.iterrows()}
-
-    # Seleccionar las queries con más índices únicos (hasta 6)
-    selected_queries = sorted(index_sets, key=lambda k: len(index_sets[k]), reverse=True)[:6]
-
-    # Crear los conjuntos para el diagrama de Venn
-    sets = {query: index_sets[query] for query in selected_queries}
-
-    # Crear el diagrama de Venn
-    plt.figure(figsize=(10, 10))
-    venn_function(sets)
-
-    # Añadir título al diagrama
-    plt.title("Diagrama de Venn de las queries seleccionadas")
-
-    # Crear el directorio si no existe
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Guardar el diagrama como una imagen
-    output_path = os.path.join(output_dir, output_filename)
-    plt.savefig(output_path)
-    plt.close()    # Leer los datos desde el archivo CSV
-    data = pd.read_csv(csv_path)
-
-    # Convertir las cadenas de índices en conjuntos
-    index_sets = {row['Query']: set(row['Index Combination'].split('+')) for _, row in data.iterrows()}
-
-    # Crear los conjuntos para el diagrama de Venn
-    sets = {query: indices for query, indices in index_sets.items()}
-
-    # Crear el diagrama de Venn
-    plt.figure(figsize=(10, 10))
-    venn_function(sets)
-
-    # Añadir título al diagrama
-    plt.title("Diagrama de Venn de todas las queries")
-
-    # Crear el directorio si no existe
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Guardar el diagrama como una imagen
-    output_path = os.path.join(output_dir, output_filename)
-    plt.savefig(output_path)
-    plt.close()    # Leer los datos desde el archivo CSV
-    data = pd.read_csv(csv_path)
-
-    # Convertir las cadenas de índices en conjuntos
-    index_sets = {row['Query']: set(row['Index Combination'].split('+')) for _, row in data.iterrows()}
-
-    # Crear los conjuntos para el diagrama de Venn
-    sets = {query: indices for query, indices in index_sets.items()}
-
-    # Crear el diagrama de Venn
-    plt.figure(figsize=(10, 10))
-    venn(sets)
-
-    # Añadir título al diagrama
-    plt.title("Diagrama de Venn de todas las queries")
-
-    # Crear el directorio si no existe
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Guardar el diagrama como una imagen
-    output_path = os.path.join(output_dir, output_filename)
-    plt.savefig(output_path)
-    plt.close()    # Leer los datos desde el archivo CSV
-    data = pd.read_csv(csv_path)
-
-    # Convertir las cadenas de índices en conjuntos
-    index_sets = {row['Query']: set(row['Index Combination'].split('+')) for _, row in data.iterrows()}
-
-    # Selección de queries para el diagrama de Venn (se pueden seleccionar hasta 3)
-    selected_queries = ["Q1", "Q2", "Q3"]
-
-    # Crear los conjuntos para el diagrama de Venn
-    set1 = index_sets[selected_queries[0]]
-    set2 = index_sets[selected_queries[1]]
-    set3 = index_sets[selected_queries[2]]
-
-    # Crear el diagrama de Venn
-    plt.figure(figsize=(8, 8))
-    venn = venn3([set1, set2, set3], set_labels=selected_queries)
-    venn3_circles([set1, set2, set3])
-
-    # Añadir etiquetas con los índices en las intersecciones
-    for idx, label in enumerate(venn.set_labels):
-        venn.set_labels[idx] = f'{selected_queries[idx]}\n({", ".join(sorted(index_sets[selected_queries[idx]]))})'
-
-    # Crear el directorio si no existe
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Guardar el diagrama como una imagen
-    output_path = os.path.join(output_dir, output_filename)
-    plt.title("Diagrama de Venn de las queries seleccionadas")
-    plt.savefig(output_path)
-    plt.close()
-         
-         
-def generate_heatmap(data):
-    # Initialize a list of indices
-    indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
-
-    # Extract the relevant columns
-    queries = data['Query'].unique()
-    binary_matrix = pd.DataFrame(0, index=indices, columns=queries)
-
-    # Fill the binary matrix
-    for idx, row in data.iterrows():
-        query = row['Query']
-        used_indices = row['Index Combination'].split('+')
-        for index in used_indices:
-            if index in indices:
-                binary_matrix.at[index, query] = 1
-
-    # Add the "Total" column which is the sum of each row
-    binary_matrix['Total'] = binary_matrix.sum(axis=1)
-
-    # Plotting the heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(binary_matrix, annot=True, cmap='YlGnBu', cbar=True)
-    plt.title('Optimization Query Heatmap')
-    plt.xlabel('Queries')
-    plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mysql/heatmap.png")
-    plt.show()
+    return min_times_df
 
 # Ejecutar la función principal
 if __name__ == "__main__":
@@ -405,8 +267,7 @@ if __name__ == "__main__":
     df = pd.read_csv(output_file)
     
     #create_and_save_boxplots(df, "./query_optimization/mysql/boxplots/")
-    #create_and_save_heatmap(df, "./query_optimization/mysql/heatmaps/")
-    #df_min_times = find_minimum_times("./query_optimization/mysql/mysql_optimization_results_encoded.csv")
-    #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
-    #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
-    generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
+    # create_and_save_heatmap(df, "./query_optimization/mysql/heatmaps/")
+    
+    decode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
+    

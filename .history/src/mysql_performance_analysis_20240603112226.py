@@ -367,7 +367,7 @@ def find_minimum_times(csv_file_path):
     plt.close()
          
          
-def generate_heatmap(data):
+def generate_heatmap(df):
     # Initialize a list of indices
     indices = ['I1', 'I2', 'I3', 'I4', 'I5', 'I6', 'I7', 'I8', 'I9', 'I10']
 
@@ -392,7 +392,6 @@ def generate_heatmap(data):
     plt.title('Optimization Query Heatmap')
     plt.xlabel('Queries')
     plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mysql/heatmap.png")
     plt.show()
 
 # Ejecutar la función principal
@@ -409,4 +408,4 @@ if __name__ == "__main__":
     #df_min_times = find_minimum_times("./query_optimization/mysql/mysql_optimization_results_encoded.csv")
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
-    generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
+    

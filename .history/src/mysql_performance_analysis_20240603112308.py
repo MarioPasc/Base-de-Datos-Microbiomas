@@ -392,7 +392,7 @@ def generate_heatmap(data):
     plt.title('Optimization Query Heatmap')
     plt.xlabel('Queries')
     plt.ylabel('Indices')
-    plt.savefig("./query_optimization/mysql/heatmap.png")
+    plt.savefig("./query_optimization/mysql/heatmap")
     plt.show()
 
 # Ejecutar la función principal
