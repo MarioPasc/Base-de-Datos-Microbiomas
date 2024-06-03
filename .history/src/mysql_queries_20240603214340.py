@@ -141,3 +141,4 @@ class Queries:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         df = pd.DataFrame.from_records(result, columns=col_name)
         df.to_csv(file_path, index=False)
+        print(f"CSV file {file_name} has been created successfully with {len(result)} records.")

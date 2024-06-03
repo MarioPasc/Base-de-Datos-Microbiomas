@@ -10,11 +10,11 @@ def add_row(df, query, time):
     df = pd.concat([df, new_row], ignore_index=True)
     return df
 
-def tiempo_query(n, query_func, n_query, df):
+def tiempo_query(n, query, n_query, df):
     tiempos = []
     for _ in range(n):
-        t = query_func()  # Ejecutar la función de consulta
-        tiempos.append(t * 1000)  # Convertir a ms
+        t = query 
+        tiempos += [t * 1000]  # Convertir a ms
     return add_row(df, f"Q{n_query}", np.mean(tiempos))
 
 def main(n=50):
@@ -26,15 +26,14 @@ def main(n=50):
     # Crear un DataFrame vacío con columnas 'Query' y 'Time'
     df = pd.DataFrame(columns=['Query', 'Time'])
 
-    # Ejecutar cada consulta 50 veces y añadir la media al DataFrame
-    df = tiempo_query(n, connection.query1, 1, df)
+    df = tiempo_query(n, connection.query1(), 1, df)
 
     microorganismos = ["MIC-17098-ZUZ", "MIC-21174-VEX", "MIC-21714-ZMU", "MIC-21822-ASC"]
     tiempos = []
     for _ in range(n):
         microorganismo = random.choice(microorganismos)
         t = connection.query2(microorganismo)
-        tiempos.append(t * 1000)  # Convertir a ms
+        tiempos += [t * 1000]  # Convertir a ms
     df = add_row(df, "Q2", np.mean(tiempos))
 
     diseases = ["Herpes simplex", "Tuberculosis", "Respiratory infections", "Tetanus"]
@@ -42,13 +41,13 @@ def main(n=50):
     for _ in range(n):
         disease = random.choice(diseases)
         t = connection.query3(disease)    
-        tiempos.append(t * 1000)  # Convertir a ms
+        tiempos += [t * 1000]  # Convertir a ms
     df = add_row(df, "Q3", np.mean(tiempos))
 
-    df = tiempo_query(n, connection.query4, 4, df)
-    df = tiempo_query(n, connection.query5, 5, df)
-    df = tiempo_query(n, connection.query6, 6, df)
-    df = tiempo_query(n, connection.query7, 7, df)
+    df = tiempo_query(n, connection.query4(), 4, df)
+    df = tiempo_query(n, connection.query5(), 5, df)
+    df = tiempo_query(n, connection.query6(), 6, df)
+    df = tiempo_query(n, connection.query7(), 7, df)
 
     return df
 
