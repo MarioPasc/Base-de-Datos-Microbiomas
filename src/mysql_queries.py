@@ -43,7 +43,7 @@ class Queries:
             if connection:
                 connection.close()
 
-    def __query1__(self):
+    def _query1__(self):
         # Find the 10 patients with the most diverse global microbiomes
         query='''SELECT p.Patient_ID, COUNT(DISTINCT sm.Microorganism_ID) AS Num_Microorganisms
                             FROM patient p, sample s, sample_microorganism sm
@@ -54,7 +54,7 @@ class Queries:
         return self.__query_format__(query,(),1)
 
 
-    def __query2__(self, microorganism_ID: str):
+    def _query2__(self, microorganism_ID: str):
         #Identify the sample and its qPCR for a given Microorganism
 
         query='''SELECT sm.Sample_ID, sm.qPCR
@@ -65,7 +65,7 @@ class Queries:
         
     
 
-    def __query3__(self, disease: str):
+    def _query3__(self, disease: str):
         #List the patients who suffer a certain disease and their associated samples.
         query='''SELECT p.Patient_ID, s.Sample_ID, s.Date, s.Body_Part, s.Sample_Type
                             FROM patient p, sample s 
@@ -74,7 +74,7 @@ class Queries:
         return self.__query_format__(query,(disease,),3)
 
 
-    def __query4__(self):
+    def _query4__(self):
         #Number of Samples per type of sample.
         query='''SELECT s.Sample_Type, COUNT(*) AS Sample_Count
                             FROM sample s
@@ -82,7 +82,7 @@ class Queries:
                             ORDER BY Sample_Count DESC;'''
         return self.__query_format__(query,(),4)
     
-    def __query5__(self):
+    def _query5__(self):
         #number of times a microorganism appears in the same sample type 
 
         query='''SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(sm.qPCR), STDDEV(sm.qPCR)
@@ -92,7 +92,7 @@ class Queries:
                 ORDER BY sm.Microorganism_ID DESC;'''
         return self.__query_format__(query,(),5)
  
-    def __query6__(self):
+    def _query6__(self):
         #Find patients who suffer from and have been diagnosed with hepatitis B and have the hepatitis B virus in their microbiome and the qPCR of this microorganism
         query='''SELECT p1.Patient_ID, s1.Max_qPCR
                 FROM (SELECT p.Patient_ID
@@ -106,7 +106,7 @@ class Queries:
                 WHERE s1.Patient_ID=p1.Patient_ID;'''
         return self.__query_format__(query,(),6)
 
-    def __query7__(self):
+    def _query7__(self):
         # Find microorganism of the same species with different sequence length.
         query='''SELECT Species, COUNT(*) AS Count, AVG(Seq_length) AS avg_SeqLength
                 FROM microorganism
