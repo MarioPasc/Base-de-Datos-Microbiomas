@@ -291,7 +291,7 @@ def generate_heatmap(data):
     plt.savefig("./query_optimization/mysql/heatmap.png")
     plt.show()
 
-def generate_clustered_heatmap(csv_path, output_path):
+def generate_clustered_heatmap(csv_path):
     # Load the CSV file
     data = pd.read_csv(csv_path)
 
@@ -315,10 +315,6 @@ def generate_clustered_heatmap(csv_path, output_path):
         cluster_grid.ax_heatmap.set_xticklabels(range(1, 8))
         cluster_grid.fig.suptitle(f'Clustered Heatmap of Execution Times for {engine}', y=1.02)
         clustered_heatmaps[engine] = cluster_grid
-        
-        # Save the figure
-        output_file = f"{output_path}/clustered_heatmap_{engine}.png"
-        cluster_grid.fig.savefig(output_file)
 
     # Show the plots
     for engine, grid in clustered_heatmaps.items():
@@ -341,5 +337,4 @@ if __name__ == "__main__":
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
     #generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
-    generate_clustered_heatmap(csv_path="./query_optimization/mysql/mysql_optimization_results_encoded.csv",
-                               output_path="./query_optimization/mysql/")
+    generate_clustered_heatmap(csv_path="./query_optimization/mysql/mysql_optimization_results_encoded.csv")

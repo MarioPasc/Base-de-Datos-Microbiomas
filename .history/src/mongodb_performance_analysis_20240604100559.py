@@ -2,8 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-import numpy as np
-
 
 def visualize_query_performance(input_file, output_dir):
     # Load the encoded CSV file

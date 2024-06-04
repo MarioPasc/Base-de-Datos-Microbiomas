@@ -201,9 +201,9 @@ if __name__ == "__main__":
 
     # Convert results to DataFrame with the specified format
     df_results = pd.DataFrame(results)
-    df_results.to_csv("./query_optimization/mysql_optimization_results.csv", index=False)
+    df_results.to_csv("query_optimization/mysql_optimization_results.csv", index=False)
 
     # Encode indices and save the new results
     df_encoded_results = encode_results(df_results)
-    df_encoded_results.to_csv("./query_optimization/mysql_encoded_optimization_results.csv", index=False)
+    df_encoded_results.to_csv("query_optimization/mysql_encoded_optimization_results.csv", index=False)
     print(df_encoded_results)

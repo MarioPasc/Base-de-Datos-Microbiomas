@@ -341,5 +341,4 @@ if __name__ == "__main__":
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
     #generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
-    generate_clustered_heatmap(csv_path="./query_optimization/mysql/mysql_optimization_results_encoded.csv",
-                               output_path="./query_optimization/mysql/")
+    generate_clustered_heatmap(csv_path="./query_optimization/mysql/mysql_optimization_results_encoded.csv")

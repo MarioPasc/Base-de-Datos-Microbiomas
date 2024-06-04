@@ -109,7 +109,7 @@ def main():
             results_df.at[query, combination_name] = time_taken
     
     # Save DataFrame to CSV
-    results_df.to_csv('query_performance_mongodb_docker.csv')
+    results_df.to_csv('query_performance.csv')
     print("Results saved to query_performance.csv")
 
 if __name__ == "__main__":

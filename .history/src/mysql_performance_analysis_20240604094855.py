@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import numpy as np
-import ast
+
 
 # Función para codificar los índices
 def encode_indices(indices_str, indices_list):
@@ -291,41 +291,6 @@ def generate_heatmap(data):
     plt.savefig("./query_optimization/mysql/heatmap.png")
     plt.show()
 
-def generate_clustered_heatmap(csv_path, output_path):
-    # Load the CSV file
-    data = pd.read_csv(csv_path)
-
-    # Convert the 'times' column from string to list of floats
-    data['times'] = data['times'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
-
-    # Filter out rows with any zero times and remove the last 3 queries from the 'times' data
-    filtered_data = data[data['times'].apply(lambda x: all(value != 0.0 for value in x))]
-    filtered_data['times'] = filtered_data['times'].apply(lambda x: x[:7])
-
-    # Separate data by engine type
-    engines = filtered_data['engine'].unique()
-    clustered_heatmaps = {}
-
-    for engine in engines:
-        engine_data = filtered_data[filtered_data['engine'] == engine]
-        times_data = np.array(engine_data['times'].tolist())
-        
-        # Create and store the clustered heatmap for the current engine
-        cluster_grid = sns.clustermap(times_data, cmap="viridis", figsize=(10, 8), yticklabels=False)
-        cluster_grid.ax_heatmap.set_xticklabels(range(1, 8))
-        cluster_grid.fig.suptitle(f'Clustered Heatmap of Execution Times for {engine}', y=1.02)
-        clustered_heatmaps[engine] = cluster_grid
-        
-        # Save the figure
-        output_file = f"{output_path}/clustered_heatmap_{engine}.png"
-        cluster_grid.fig.savefig(output_file)
-
-    # Show the plots
-    for engine, grid in clustered_heatmaps.items():
-        plt.figure(grid.fig.number)
-        plt.show()
-
-
 # Ejecutar la función principal
 if __name__ == "__main__":
     # Especificar los archivos de entrada y salida
@@ -340,6 +305,4 @@ if __name__ == "__main__":
     #df_min_times = find_minimum_times("./query_optimization/mysql/mysql_optimization_results_encoded.csv")
     #df_min_times.to_csv("./query_optimization/mysql/best_combinations.csv")
     #ecode_indices("./query_optimization/mysql/best_combinations.csv", "./query_optimization/mysql/best_combinations_decoded.csv")
-    #generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
-    generate_clustered_heatmap(csv_path="./query_optimization/mysql/mysql_optimization_results_encoded.csv",
-                               output_path="./query_optimization/mysql/")
+    generate_heatmap(pd.read_csv("./query_optimization/mysql/best_combinations.csv"))
