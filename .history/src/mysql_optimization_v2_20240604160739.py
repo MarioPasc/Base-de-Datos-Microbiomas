@@ -19,14 +19,14 @@ class QueryOptimizer:
         )
 
     def execute_query(self, query, params=None):
-        """Executes a given SQL query and returns the duration of the execution in milliseconds."""
+        """Executes a given SQL query and returns the duration of the execution."""
         connection = self.connect_to_db()
         cursor = connection.cursor()
         try:
             start_time = time.time()
             cursor.execute(query, params)
             cursor.fetchall()  # Fetch results to complete query execution
-            duration = (time.time() - start_time) * 1000  # Convert to milliseconds
+            duration = time.time() - start_time
         except mysql.connector.Error as err:
             print(f"Error executing query: {err}")
             duration = np.nan
@@ -80,7 +80,7 @@ class QueryOptimizer:
             connection.close()
 
     def measure_query_times(self, queries):
-        """Measures the execution time of each query 30 times and returns the average times in milliseconds."""
+        """Measures the execution time of each query 30 times and returns the average times."""
         avg_times = []
         for query in queries:
             durations = []
@@ -97,32 +97,21 @@ class QueryOptimizer:
             itertools.combinations(indices, r) for r in range(len(indices)+1)
         ))
         results = []
-        header_written = False  # To track if the header is written
-        with open("query_optimization/mysql_optimization_results.csv", "a") as f:
-            for engine in engines:
-                self.set_engine(engine)
-                self.disable_foreign_keys()
-                for combination in tqdm(all_combinations, desc=f"Testing index combinations with engine {engine}"):
-                    self.drop_indices()
-                    for index_query in combination:
-                        self.create_index(index_query)
-                    times = self.measure_query_times(queries)
-                    result = {
-                        "Engine": engine,
-                        "Indices": combination,
-                        "Q1": times[0],
-                        "Q2": times[1],
-                        "Q3": times[2],
-                        "Q4": times[3],
-                        "Q5": times[4],
-                        "Q6": times[5],
-                        "Q7": times[6]
-                    }
-                    results.append(result)
-                    df_result = pd.DataFrame([result])
-                    df_result.to_csv(f, header= not header_written, index=False)
-                    header_written = True  # Header is written after the first write
-                self.enable_foreign_keys()
+        for engine in engines:
+            self.set_engine(engine)
+            self.disable_foreign_keys()
+            for combination in tqdm(all_combinations, desc=f"Testing index combinations with engine {engine}"):
+                self.drop_indices()
+                for index_query in combination:
+                    self.create_index(index_query)
+                times = self.measure_query_times(queries)
+                result = {
+                    "Engine": engine,
+                    "Indices": combination,
+                    "Q1": times[0]
+                }
+                results.append(result)
+            self.enable_foreign_keys()
         return results
 
     def set_engine(self, engine):
@@ -180,13 +169,7 @@ if __name__ == "__main__":
     database = "microbiomeDB"
 
     queries = [
-        {"sql": "SELECT p.Patient_ID, COUNT(DISTINCT sm.Microorganism_ID) AS Num_Microorganisms FROM patient p, sample s, sample_microorganism sm WHERE p.Patient_ID= s.Patient_ID AND s.Sample_ID= sm.Sample_ID GROUP BY p.Patient_ID ORDER BY Num_Microorganisms DESC LIMIT 10;"},
-        {"sql": "SELECT sm.Sample_ID, sm.qPCR FROM sample_microorganism sm WHERE sm.Microorganism_ID = %s ORDER BY sm.qPCR DESC;", "params": ("microorganism_id",)},
-        {"sql": "SELECT p.Patient_ID, s.Sample_ID, s.Date, s.Body_Part, s.Sample_Type FROM patient p, sample s WHERE p.Patient_ID = s.Patient_ID AND p.Disease = %s ORDER BY s.Date;", "params": ("disease",)},
-        {"sql": "SELECT s.Sample_Type, COUNT(*) AS Sample_Count FROM sample s GROUP BY s.Sample_Type ORDER BY Sample_Count DESC;"},
-        {"sql": "SELECT sm.Microorganism_ID, s.Sample_Type, COUNT(sm.Sample_ID) AS Sample_Count, AVG(sm.qPCR), STDDEV(sm.qPCR) FROM sample s, sample_microorganism sm WHERE s.Sample_ID= sm.Sample_ID GROUP BY s.Sample_Type, sm.Microorganism_ID ORDER BY sm.Microorganism_ID DESC;"},
-        {"sql": "SELECT p1.Patient_ID, s1.Max_qPCR FROM (SELECT p.Patient_ID FROM patient p WHERE p.disease='Hepatitis B') p1, (SELECT s.Patient_ID, max(sm.qPCR) as Max_qPCR FROM sample s, microorganism m, sample_microorganism sm WHERE s.Sample_ID=sm.Sample_ID AND sm.Microorganism_ID=m.Microorganism_ID AND m.Species='Hepatitis B Virus' GROUP BY s.Patient_ID) s1 WHERE s1.Patient_ID=p1.Patient_ID;"},
-        {"sql": "SELECT Species, COUNT(*) AS Count, AVG(Seq_length) AS avg_SeqLength FROM microorganism GROUP BY Species HAVING Count>1;"}
+        {"sql": "SELECT p.Patient_ID, COUNT(DISTINCT sm.Microorganism_ID) AS Num_Microorganisms FROM patient p, sample s, sample_microorganism sm WHERE p.Patient_ID= s.Patient_ID AND s.Sample_ID= sm.Sample_ID GROUP BY p.Patient_ID ORDER BY Num_Microorganisms DESC LIMIT 10;"}
     ]
 
     indices = [
@@ -199,12 +182,16 @@ if __name__ == "__main__":
         "CREATE INDEX idx_sample_type ON sample(Sample_Type);"
     ]
 
-    engines = ["InnoDB", "MyISAM", "MEMORY"]
+    engines = ["MEMORY", "MyISAM", "InnoDB"]
 
     optimizer = QueryOptimizer(password, database)
     results = optimizer.optimize(queries, indices, engines)
 
+    # Convert results to DataFrame with the specified format
+    df_results = pd.DataFrame(results)
+    df_results.to_csv("./query_optimization/mysql_optimization_results.csv", index=False)
+
     # Encode indices and save the new results
-    df_encoded_results = encode_results(pd.DataFrame(results))
-    df_encoded_results.to_csv("query_optimization/mysql_encoded_optimization_results.csv", index=False)
+    df_encoded_results = encode_results(df_results)
+    df_encoded_results.to_csv("./query_optimization/mysql_encoded_optimization_results.csv", index=False)
     print(df_encoded_results)

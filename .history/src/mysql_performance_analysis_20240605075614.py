@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import linkage, dendrogram
 from scipy.spatial.distance import pdist
 from typing import Any
 
@@ -41,17 +41,16 @@ class CSVVisualizer:
         plt.savefig(f"{self.figure_path}clustered_heatmap.png")
         plt.close()
 
-    def plot_boxplot(self) -> None:
-        """Generates and saves a boxplot for query execution times by engine."""
-        # Compute the mean execution time across all queries for each index and engine
-        self.data['MeanQueryTime'] = self.data[['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']].mean(axis=1)
-
+    def plot_violin_plot(self) -> None:
+        """Generates and saves a violin plot for query execution times by engine."""
         plt.figure(figsize=(15, 10))
-        sns.boxplot(x='Engine', y='MeanQueryTime', data=self.data, palette="muted")
-        plt.ylabel("Mean Execution Time (ms)")
+        melted_data = pd.melt(self.data, id_vars=['Engine'], value_vars=['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7'])
+        sns.violinplot(x='Engine', y='value', hue='variable', data=melted_data, split=True, inner="quart", palette="muted")
+        plt.ylabel("Execution Time (ms)")
         plt.xlabel("Storage Engine")
-        plt.title("Distribution of Mean Query Execution Times by Storage Engine")
-        plt.savefig(f"{self.figure_path}boxplot.png")
+        plt.title("Distribution of Query Execution Times by Storage Engine")
+        plt.legend(title="Queries")
+        plt.savefig(f"{self.figure_path}violin_plot.png")
         plt.close()
 
     def plot_clustered_heatmap_by_engine(self) -> None:
@@ -59,8 +58,7 @@ class CSVVisualizer:
         engines = self.data['Engine'].unique()
         for engine in engines:
             data_subset = self.data[self.data['Engine'] == engine]
-            melted_data = pd.melt(data_subset, id_vars=['Indices'], value_vars=['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7'])
-            data_pivot = melted_data.pivot(index='variable', columns='Indices', values='value')
+            data_pivot = data_subset.pivot(index='Indices', columns='variable', values='value')
             data_normalized = self.normalize_data(data_pivot)
             dist_matrix = pdist(data_normalized.T, metric='euclidean')
             linkage_matrix = linkage(dist_matrix, method='ward')
@@ -98,12 +96,12 @@ class CSVVisualizer:
         plt.close()
 
 if __name__ == "__main__":
-    csv_path = "./query_optimization/mysql/mysql_encoded_optimization_results.csv"
+    csv_path = "/mnt/data/mysql_encoded_optimization_results.csv"
     figure_path = "./query_optimization/mysql/figures/"
 
     visualizer = CSVVisualizer(csv_path, figure_path)
     visualizer.plot_clustered_heatmap()
-    visualizer.plot_boxplot()
+    visualizer.plot_violin_plot()
     visualizer.plot_clustered_heatmap_by_engine()
     visualizer.plot_innodb_optimal_indices_heatmap()
     print(f"Visualizations saved to {figure_path}")

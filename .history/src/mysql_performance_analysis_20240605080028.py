@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     visualizer = CSVVisualizer(csv_path, figure_path)
     visualizer.plot_clustered_heatmap()
-    visualizer.plot_boxplot()
+    visualizer.plot_violin_plot()
     visualizer.plot_clustered_heatmap_by_engine()
     visualizer.plot_innodb_optimal_indices_heatmap()
     print(f"Visualizations saved to {figure_path}")

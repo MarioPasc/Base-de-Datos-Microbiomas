@@ -97,7 +97,6 @@ class QueryOptimizer:
             itertools.combinations(indices, r) for r in range(len(indices)+1)
         ))
         results = []
-        header_written = False  # To track if the header is written
         with open("query_optimization/mysql_optimization_results.csv", "a") as f:
             for engine in engines:
                 self.set_engine(engine)
@@ -120,8 +119,7 @@ class QueryOptimizer:
                     }
                     results.append(result)
                     df_result = pd.DataFrame([result])
-                    df_result.to_csv(f, header= not header_written, index=False)
-                    header_written = True  # Header is written after the first write
+                    df_result.to_csv(f, header=f.tell() == 0, index=False)
                 self.enable_foreign_keys()
         return results
 
@@ -204,7 +202,11 @@ if __name__ == "__main__":
     optimizer = QueryOptimizer(password, database)
     results = optimizer.optimize(queries, indices, engines)
 
+    # Convert results to DataFrame with the specified format
+    df_results = pd.DataFrame(results)
+    df_results.to_csv("query_optimization/mysql_optimization_results.csv", index=False)
+
     # Encode indices and save the new results
-    df_encoded_results = encode_results(pd.DataFrame(results))
+    df_encoded_results = encode_results(df_results)
     df_encoded_results.to_csv("query_optimization/mysql_encoded_optimization_results.csv", index=False)
     print(df_encoded_results)

@@ -41,17 +41,17 @@ class CSVVisualizer:
         plt.savefig(f"{self.figure_path}clustered_heatmap.png")
         plt.close()
 
-    def plot_boxplot(self) -> None:
-        """Generates and saves a boxplot for query execution times by engine."""
+    def plot_violin_plot(self) -> None:
+        """Generates and saves a violin plot for query execution times by engine."""
         # Compute the mean execution time across all queries for each index and engine
         self.data['MeanQueryTime'] = self.data[['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']].mean(axis=1)
 
         plt.figure(figsize=(15, 10))
-        sns.boxplot(x='Engine', y='MeanQueryTime', data=self.data, palette="muted")
+        sns.violinplot(x='Engine', y='MeanQueryTime', data=self.data, inner="quart", palette="muted")
         plt.ylabel("Mean Execution Time (ms)")
         plt.xlabel("Storage Engine")
         plt.title("Distribution of Mean Query Execution Times by Storage Engine")
-        plt.savefig(f"{self.figure_path}boxplot.png")
+        plt.savefig(f"{self.figure_path}violin_plot.png")
         plt.close()
 
     def plot_clustered_heatmap_by_engine(self) -> None:
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     visualizer = CSVVisualizer(csv_path, figure_path)
     visualizer.plot_clustered_heatmap()
-    visualizer.plot_boxplot()
+    visualizer.plot_violin_plot()
     visualizer.plot_clustered_heatmap_by_engine()
     visualizer.plot_innodb_optimal_indices_heatmap()
     print(f"Visualizations saved to {figure_path}")

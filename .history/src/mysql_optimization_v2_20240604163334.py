@@ -120,7 +120,7 @@ class QueryOptimizer:
                     }
                     results.append(result)
                     df_result = pd.DataFrame([result])
-                    df_result.to_csv(f, header= not header_written, index=False)
+                    df_result.to_csv(f, header=not header_written, index=False)
                     header_written = True  # Header is written after the first write
                 self.enable_foreign_keys()
         return results

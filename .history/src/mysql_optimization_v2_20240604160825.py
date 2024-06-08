@@ -19,14 +19,14 @@ class QueryOptimizer:
         )
 
     def execute_query(self, query, params=None):
-        """Executes a given SQL query and returns the duration of the execution in milliseconds."""
+        """Executes a given SQL query and returns the duration of the execution."""
         connection = self.connect_to_db()
         cursor = connection.cursor()
         try:
             start_time = time.time()
             cursor.execute(query, params)
             cursor.fetchall()  # Fetch results to complete query execution
-            duration = (time.time() - start_time) * 1000  # Convert to milliseconds
+            duration = time.time() - start_time
         except mysql.connector.Error as err:
             print(f"Error executing query: {err}")
             duration = np.nan
@@ -80,7 +80,7 @@ class QueryOptimizer:
             connection.close()
 
     def measure_query_times(self, queries):
-        """Measures the execution time of each query 30 times and returns the average times in milliseconds."""
+        """Measures the execution time of each query 30 times and returns the average times."""
         avg_times = []
         for query in queries:
             durations = []
@@ -97,32 +97,27 @@ class QueryOptimizer:
             itertools.combinations(indices, r) for r in range(len(indices)+1)
         ))
         results = []
-        header_written = False  # To track if the header is written
-        with open("query_optimization/mysql_optimization_results.csv", "a") as f:
-            for engine in engines:
-                self.set_engine(engine)
-                self.disable_foreign_keys()
-                for combination in tqdm(all_combinations, desc=f"Testing index combinations with engine {engine}"):
-                    self.drop_indices()
-                    for index_query in combination:
-                        self.create_index(index_query)
-                    times = self.measure_query_times(queries)
-                    result = {
-                        "Engine": engine,
-                        "Indices": combination,
-                        "Q1": times[0],
-                        "Q2": times[1],
-                        "Q3": times[2],
-                        "Q4": times[3],
-                        "Q5": times[4],
-                        "Q6": times[5],
-                        "Q7": times[6]
-                    }
-                    results.append(result)
-                    df_result = pd.DataFrame([result])
-                    df_result.to_csv(f, header= not header_written, index=False)
-                    header_written = True  # Header is written after the first write
-                self.enable_foreign_keys()
+        for engine in engines:
+            self.set_engine(engine)
+            self.disable_foreign_keys()
+            for combination in tqdm(all_combinations, desc=f"Testing index combinations with engine {engine}"):
+                self.drop_indices()
+                for index_query in combination:
+                    self.create_index(index_query)
+                times = self.measure_query_times(queries)
+                result = {
+                    "Engine": engine,
+                    "Indices": combination,
+                    "Q1": times[0],
+                    "Q2": times[1],
+                    "Q3": times[2],
+                    "Q4": times[3],
+                    "Q5": times[4],
+                    "Q6": times[5],
+                    "Q7": times[6]
+                }
+                results.append(result)
+            self.enable_foreign_keys()
         return results
 
     def set_engine(self, engine):
@@ -204,7 +199,11 @@ if __name__ == "__main__":
     optimizer = QueryOptimizer(password, database)
     results = optimizer.optimize(queries, indices, engines)
 
+    # Convert results to DataFrame with the specified format
+    df_results = pd.DataFrame(results)
+    df_results.to_csv("./query_optimization/mysql_optimization_results.csv", index=False)
+
     # Encode indices and save the new results
-    df_encoded_results = encode_results(pd.DataFrame(results))
-    df_encoded_results.to_csv("query_optimization/mysql_encoded_optimization_results.csv", index=False)
+    df_encoded_results = encode_results(df_results)
+    df_encoded_results.to_csv("./query_optimization/mysql_encoded_optimization_results.csv", index=False)
     print(df_encoded_results)
