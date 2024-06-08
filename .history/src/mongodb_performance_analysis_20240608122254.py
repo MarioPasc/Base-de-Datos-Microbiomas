@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -227,11 +228,12 @@ def generate_clustered_heatmap(csv_path, output_path):
 def main():
     input_file = './query_optimization/mongodb/query_performance.csv'
     output_file = './query_optimization/mongodb/encoded_performance_mongodb.csv'
-    #encode_and_save_csv(input_file, output_file)
-    #visualize_query_performance(output_file, "./query_optimization/")
-    #save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
-    #generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
+    encode_and_save_csv(input_file, output_file)
+    visualize_query_performance(output_file, "./query_optimization/")
+    save_min_times(input_file=output_file, output_file="./query_optimization/mongodb/best_times_mongodb.csv")
+    generate_heatmap("./query_optimization/mongodb/best_times_mongodb.csv")
     comparison_heatmap(".\query_optimization\mongodb\query3_comparison.csv")
 
 if __name__ == "__main__":
     main()
+
