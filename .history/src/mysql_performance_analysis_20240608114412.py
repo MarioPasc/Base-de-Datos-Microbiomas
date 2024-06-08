@@ -109,8 +109,8 @@ class CSVVisualizer:
         plt.title(f"Optimal Indices for InnoDB Engine (Top {n} Executions per Query)")
         plt.savefig(f"{self.figure_path}optimal_indices_heatmap_innodb_top_{n}.png")
         plt.close()
- 
-    def plot_innodb_optimal_indices_heatmap_and_freq(self, n: int = 10) -> None:
+
+ def plot_innodb_optimal_indices_heatmap_and_freq(self, n: int = 10) -> None:
         """Finds and plots the optimal indices heatmap for InnoDB engine."""
         innodb_data = self.data[self.data['Engine'] == 'InnoDB']
         optimal_indices = {f'Q{i+1}': [] for i in range(7)}
@@ -132,16 +132,15 @@ class CSVVisualizer:
         total_counts = heatmap_data.sum(axis=1)
 
         # Plotting
-        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [2, 1]})
+        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [4, 1]})
 
         # Heatmap
         sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=False, ax=axes[0])
-        axes[0].set_title(f"Optimal Indexes for InnoDB Engine (Top {n} Executions per Query)")
+        axes[0].set_title(f"Optimal Indices for InnoDB Engine (Top {n} Executions per Query)")
 
         # Bar plot
         sns.barplot(x=total_counts.values, y=total_counts.index, palette='viridis', ax=axes[1])
         axes[1].set_xlabel('Total Frequency')
-        axes[1].set_ylabel('Indexes')
         axes[1].set_title('Total Frequency of Indices')
 
         plt.tight_layout()
@@ -157,5 +156,5 @@ if __name__ == "__main__":
     visualizer.plot_boxplot()
     visualizer.plot_clustered_heatmap_by_engine()
     visualizer.plot_innodb_optimal_indices_heatmap()
-    visualizer.plot_innodb_optimal_indices_heatmap_and_freq()
+    visualizer.plot_innodb_index_frequency()
     print(f"Visualizations saved to {figure_path}")

@@ -132,7 +132,7 @@ class CSVVisualizer:
         total_counts = heatmap_data.sum(axis=1)
 
         # Plotting
-        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [2, 1]})
+        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [3, 1]})
 
         # Heatmap
         sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=False, ax=axes[0])

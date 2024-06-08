@@ -132,16 +132,15 @@ class CSVVisualizer:
         total_counts = heatmap_data.sum(axis=1)
 
         # Plotting
-        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [2, 1]})
+        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [3, 1]})
 
         # Heatmap
         sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=False, ax=axes[0])
-        axes[0].set_title(f"Optimal Indexes for InnoDB Engine (Top {n} Executions per Query)")
+        axes[0].set_title(f"Optimal Indices for InnoDB Engine (Top {n} Executions per Query)")
 
         # Bar plot
         sns.barplot(x=total_counts.values, y=total_counts.index, palette='viridis', ax=axes[1])
         axes[1].set_xlabel('Total Frequency')
-        axes[1].set_ylabel('Indexes')
         axes[1].set_title('Total Frequency of Indices')
 
         plt.tight_layout()

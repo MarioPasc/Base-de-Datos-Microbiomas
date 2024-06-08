@@ -84,68 +84,62 @@ class CSVVisualizer:
             plt.savefig(f"{self.figure_path}clustered_heatmap_{engine}.png")
             plt.close()
 
-    def plot_innodb_optimal_indices_heatmap(self, n: int = 10) -> None:
+    def plot_innodb_optimal_indices_heatmap(self) -> None:
         """Finds and plots the optimal indices heatmap for InnoDB engine."""
         innodb_data = self.data[self.data['Engine'] == 'InnoDB']
-        optimal_indices = {f'Q{i+1}': [] for i in range(7)}
+        optimal_indices = []
 
-        for i, query in enumerate(['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']):
-            top_n_rows = innodb_data.nsmallest(n, query)
-            for indices in top_n_rows['Indices']:
-                optimal_indices[f'Q{i+1}'].extend(indices.split('+'))
+        for query in ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']:
+            min_time_row = innodb_data.loc[innodb_data[query].idxmin()]
+            indices = min_time_row['Indices'].split('+')
+            optimal_indices.append(indices)
 
         # Create a DataFrame for the heatmap
-        index_set = sorted(set(idx for indices in optimal_indices.values() for idx in indices))
+        index_set = sorted(set([idx for sublist in optimal_indices for idx in sublist]))
         heatmap_data = pd.DataFrame(0, index=index_set, columns=['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7'])
 
-        for query, indices in optimal_indices.items():
+        for i, indices in enumerate(optimal_indices):
             for idx in indices:
-                heatmap_data.at[idx, query] += 1
+                heatmap_data.at[idx, f'Q{i+1}'] = 1
 
         heatmap_data['Total'] = heatmap_data.sum(axis=1)
 
         plt.figure(figsize=(15, 10))
         sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu')
-        plt.title(f"Optimal Indices for InnoDB Engine (Top {n} Executions per Query)")
-        plt.savefig(f"{self.figure_path}optimal_indices_heatmap_innodb_top_{n}.png")
+        plt.title("Optimal Indices for InnoDB Engine")
+        plt.savefig(f"{self.figure_path}optimal_indices_heatmap_innodb.png")
         plt.close()
- 
-    def plot_innodb_optimal_indices_heatmap_and_freq(self, n: int = 10) -> None:
-        """Finds and plots the optimal indices heatmap for InnoDB engine."""
+
+    def plot_innodb_index_frequency(self) -> None:
+        """Generates and saves a bar plot for the frequency of index usage in the top 10 fastest queries for InnoDB."""
+        # Filter the data for InnoDB engine
         innodb_data = self.data[self.data['Engine'] == 'InnoDB']
-        optimal_indices = {f'Q{i+1}': [] for i in range(7)}
 
-        for i, query in enumerate(['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7']):
-            top_n_rows = innodb_data.nsmallest(n, query)
-            for indices in top_n_rows['Indices']:
-                optimal_indices[f'Q{i+1}'].extend(indices.split('+'))
+        # Find the 10 queries with the lowest mean execution time
+        top_10_queries = innodb_data.nsmallest(20, 'MeanQueryTime')
 
-        # Create a DataFrame for the heatmap
-        index_set = sorted(set(idx for indices in optimal_indices.values() for idx in indices))
-        heatmap_data = pd.DataFrame(0, index=index_set, columns=['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7'])
+        # Decompose the index combinations into individual indices
+        all_indices = top_10_queries['Indices'].str.split('+').explode()
 
-        for query, indices in optimal_indices.items():
-            for idx in indices:
-                heatmap_data.at[idx, query] += 1
+        # Count the frequency of each index
+        index_counts = all_indices.value_counts()
 
-        # Calculate the total frequency for the bar plot
-        total_counts = heatmap_data.sum(axis=1)
+        # Ensure the index order is "I1", "I2", "I3", ..., "I7"
+        index_order = [f'I{i}' for i in range(1, 8)]
+        index_counts = index_counts.reindex(index_order).fillna(0)
 
-        # Plotting
-        fig, axes = plt.subplots(ncols=2, figsize=(20, 10), gridspec_kw={'width_ratios': [2, 1]})
+        # Plot the frequency of each index
+        plt.figure(figsize=(15, 10))
+        barplot = sns.barplot(x=index_counts.index, y=index_counts.values, palette='viridis')
+        barplot.set_xlabel('Index')
+        barplot.set_ylabel('Frequency')
+        barplot.set_title('Frequency of Index Usage in the Top 10 Fastest Queries for InnoDB')
 
-        # Heatmap
-        sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=False, ax=axes[0])
-        axes[0].set_title(f"Optimal Indexes for InnoDB Engine (Top {n} Executions per Query)")
+        # Annotate the bars with the frequency values
+        for container in barplot.containers:
+            barplot.bar_label(container)
 
-        # Bar plot
-        sns.barplot(x=total_counts.values, y=total_counts.index, palette='viridis', ax=axes[1])
-        axes[1].set_xlabel('Total Frequency')
-        axes[1].set_ylabel('Indexes')
-        axes[1].set_title('Total Frequency of Indices')
-
-        plt.tight_layout()
-        plt.savefig(f"{self.figure_path}optimal_indices_heatmap_innodb_top_{n}.png")
+        plt.savefig(f"{self.figure_path}innodb_index_frequency.png")
         plt.close()
 
 if __name__ == "__main__":
@@ -157,5 +151,5 @@ if __name__ == "__main__":
     visualizer.plot_boxplot()
     visualizer.plot_clustered_heatmap_by_engine()
     visualizer.plot_innodb_optimal_indices_heatmap()
-    visualizer.plot_innodb_optimal_indices_heatmap_and_freq()
+    visualizer.plot_innodb_index_frequency()
     print(f"Visualizations saved to {figure_path}")
