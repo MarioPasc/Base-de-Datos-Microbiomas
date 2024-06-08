@@ -49,19 +49,17 @@ class CSVVisualizer:
         # Calculate the mean times for each engine
         mean_times = self.data.groupby('Engine')['MeanQueryTime'].mean().to_dict()
 
-        # Define the order of engines and a custom palette
-        engine_order = ['MyISAM', 'MEMORY', 'InnoDB']
-        palette = {'InnoDB': '#5DADE2', 'MEMORY': '#58D68D', 'MyISAM': '#EC7063'}
-
         plt.figure(figsize=(15, 10))
-        boxplot = sns.boxplot(x='Engine', y='MeanQueryTime', data=self.data, order=engine_order, palette=palette)
+        # Use a custom palette for the boxplot
+        palette = {'InnoDB': '#5DADE2', 'MEMORY': '#58D68D', 'MyISAM': '#EC7063'}
+        boxplot = sns.boxplot(x='Engine', y='MeanQueryTime', data=self.data, palette=palette)
         plt.ylabel("Mean Execution Time (ms)")
         plt.xlabel("Storage Engine")
         plt.title("Distribution of Mean Query Execution Times by Storage Engine")
 
         # Add the mean times to the legend
-        legend_labels = [f'{engine} (mean: {mean_times[engine]/1000:.4f}s)' for engine in engine_order]
-        handles = [plt.Line2D([0], [0], color=palette[engine], lw=4) for engine in engine_order]
+        legend_labels = [f'{engine} (mean: {mean_time:.4f}s)' for engine, mean_time in mean_times.items()]
+        handles = [plt.Line2D([0], [0], color=color, lw=4) for color in palette.values()]
         plt.legend(handles, legend_labels, title="Engines")
 
         plt.savefig(f"{self.figure_path}boxplot.png")

@@ -60,7 +60,7 @@ class CSVVisualizer:
         plt.title("Distribution of Mean Query Execution Times by Storage Engine")
 
         # Add the mean times to the legend
-        legend_labels = [f'{engine} (mean: {mean_times[engine]/1000:.4f}s)' for engine in engine_order]
+        legend_labels = [f'{engine} (mean: {mean_times[engine]:.4f}ms)' for engine in engine_order]
         handles = [plt.Line2D([0], [0], color=palette[engine], lw=4) for engine in engine_order]
         plt.legend(handles, legend_labels, title="Engines")
 
